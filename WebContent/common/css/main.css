@@ -1,0 +1,494 @@
+/*
+LEGAL
+=====
+Copyright: Daemon Pty Limited 2006, http://www.daemon.com.au
+Community: Mollio http://www.mollio.org $
+License: Released Under the "Common Public License 1.0", 
+http://www.opensource.org/licenses/cpl.php
+License: Released Under the "Creative Commons License", 
+http://creativecommons.org/licenses/by/2.5/
+License: Released Under the "GNU Creative Commons License", 
+http://creativecommons.org/licenses/GPL/2.0/
+*/
+
+/* THE BIG GUYS */
+* {margin:0;padding:0}
+body {padding: 0 0 20px; /*background: #fff url("images/body_bg.gif") repeat-x 0 100%; */color:#333;font:83%/1.5 arial,tahoma,verdana,sans-serif}
+
+/* LINKS */
+a,a:link,a:link,a:link,a:hover {background:transparent;text-decoration:none;cursor:pointer} 
+a:link {color:#222} 
+a:visited {color:#222} 
+a:hover,a:active {color:#000; text-decoration:underline;} 
+
+
+.mt5{margin-top: 5px;}
+.mt10{margin-top: 10px;}
+.mt15{margin-top: 15px;}
+.mt20{margin-top: 20px;}
+
+.mb5{margin-bottom: 5px;}
+.mb10{margin-bottom: 10px;}
+.mb15{margin-bottom: 15px;}
+.mb20{margin-bottom: 20px;}
+
+.ml5{margin-left: 5px;}
+.ml10{margin-left: 10px;}
+.ml15{margin-left: 15px;}
+.ml20{margin-left: 20px;}
+
+.mr5{margin-right: 5px;}
+.mr10{margin-right: 10px;}
+.mr15{margin-right: 15px;}
+.mr20{margin-right: 20px;}
+
+p, ul, ol {margin: 0 0 1.5em}
+h1, h2, h3, h4, h5, h6 {letter-spacing: -1px;font-family: arial,verdana,sans-serif;margin: 1.2em 0 .3em;color:#000;border-bottom: 1px solid #eee;padding-bottom: .1em}
+h1 {font-size: 196%;margin-top:.6em}
+h2 {font-size: 136%}
+h3 {font-size: 126%}
+h4 {font-size: 116%}
+h5 {font-size: 106%}
+h6 {font-size: 96%}
+.highlight {color:#E17000}
+.subdued {color:#999}
+.error {color:#c00;font-weight:bold}
+.success {color:#390;font-weight:bold}
+.caption {color:#999;font-size:11px}
+.date {font: bold 82% arial;color:#bbb;display:block;letter-spacing: 1px}
+small {font-size:11px}
+
+/* LISTS */
+ul {margin: .3em 0 1.5em 0;list-style-type:none}
+	ul.related {margin-top: -1em}
+ol {margin: .5em .5em 1.5em}
+ol li {margin-left: 1.4em;padding-left: 0;background: none; list-style-type: decimal}
+li {line-height: 1.4em;padding-left: 25px;background: transparent url("images/sprites.gif") no-repeat 0 0}
+li.doc {background-position: 3px -500px}
+ul.nomarker li {background:none;padding-left:0}
+
+dl {margin: 0 0 1em 0}
+dt {font-weight:bold;margin-top: 1.3em}
+dl dl {margin: 0 0 1.5em 30px}
+
+/* GENERAL */
+img {border:none} 
+hr {margin: 1em 0;background:#f2f2f2;height:1px;color:#f2f2f2;border:none;clear:both}
+.clear {clear:both;position:relative;font-size:0px;height:0px;line-height:0px} 
+
+
+/* LAYOUT - HEADER */
+#header {background: #666 url("images/sprites.gif") repeat-x 0 100%;margin: 0 0 12px;padding: 0 0 8px}
+
+	#header #site-name {font: 265% arial;letter-spacing: -.05em;margin:0 0 0 40px;padding:3px 0;color:#ccc;border:none}
+	
+	/* NAV - top horizontal nav */
+	#nav, #nav ul {padding: 0;margin: 0;list-style: none}
+	#nav {font-weight:bold;height:2.09em;font: bold 96% arial;margin: 0 105px 0 40px}
+	#nav li {position:relative;background: #999;float: left;width: 10em;display:block;margin: 0;border-bottom: 3px solid #666;border-right: 3px solid #252525;padding:0}
+	#nav a, #nav a:link, #nav a:visited, #nav a:hover, #nav a:active {text-decoration:none;cursor:pointer;color:#fff;display: block;padding: 4px 10px 2px}
+	#nav a:hover {color:#000}
+	
+	#nav li ul {border-left: 1px solid #c00;background: #f6f6f6 url("images/featurebox_bg.gif") no-repeat 100% 100%;width:15.8em;font-size:90%;margin-top:3px;position: absolute;font-weight:normal;left: -999em}
+	#nav li:hover ul, #nav li.sfhover ul {left: 0;z-index:99999}
+	
+	#nav li li {background:none;float:none;border:none;border: 1px solid #999;border-top:1px solid #fff;border-right:none;border-left:none;padding-left:0}
+	#nav li li.last {border-bottom:none}
+	#nav li li a, #nav li li a:link, #nav li li a:visited, #nav li li a:hover {color:#000;padding: 3px 10px 2px;width:14em}
+	#nav li li a:hover {color:#fff;background:#c00}
+	
+	#nav li.active {background: #c00;border-bottom: 3px solid #c00}
+	#nav li.active ul {border:none;background: #c00 url("images/featurebox2_bg.gif") no-repeat 100% 100%}
+	#nav li.active a:link, #nav li.active a:visited, #nav li.active a:hover, #nav li.active a:active {}
+	#nav li.active a:hover {color:#000}
+	
+	#nav li.active li {border:none;border-top: 1px solid #c15c5c;border-bottom: 1px solid #870000}
+	#nav li.active li.last {border-bottom: none}
+	#nav li.active li a:link, #nav li.active li a:visited, #nav li.active li a:hover, #nav li.active li a:active {color:#fff}
+	#nav li.active li a:hover {background: #666 url("images/sprites.gif") repeat-x 0 99%;color:#fff}
+	
+	#nav li.active li.active a:link, #nav li.active li.active a:visited, #nav li.active li.active a:hover, #nav li.active li.active a:active {color:#fff;font-weight:bold;background: #666 url("images/sprites.gif") repeat-x 0 99%}
+
+	/* hide from IE mac \*/
+	#nav li {width:auto}
+	/* end hiding from IE5 mac */
+	
+	/* SEARCH */
+	#search {color:#fff;position:absolute;top:50px;right:5px;left:auto;}
+	#search label {padding:5px 0 0;display:inline; font-weight: bold;}
+	#search button {height: 20px; bolder: 0 none; font-size: 11px; display:inline;}
+	
+	/* POWERED BY - mollio logo in this case */
+	#poweredby {width:96px;height:63px;position:absolute;top:-102px;right:0}
+
+/* LAYOUT - main body of page */
+#wrap {min-width:770px;max-width:1200px;margin: 0 auto;position:relative}
+#content-wrap {position:relative;width:100%}
+	#utility {position:absolute;top:0;left:25px;width:165px;border-top: 5px solid #999;padding-bottom: 40px}
+	#sidebar {position:absolute;top:0;right:25px;width:20%;border-top: 5px solid #999;padding-top: 1px;padding-bottom: 40px}
+
+#content {margin: 0px}
+	#content #breadcrumb {margin-top:-5px;font-size:93%;font-weight:bold; text-align: right;}
+	#content #breadcrumb a:link, #content #breadcrumb a:visited {text-decoration:none}
+	#content #breadcrumb a:hover, #content #breadcrumb a:active {text-decoration:underline}
+	
+	.featurebox {color:#333;padding: 15px 20px 20px;border-top: 1px solid #d7d7d7;margin: 0 0 1.5em;background: #f6f6f6 url("images/featurebox_bg.gif") no-repeat 100% 100%}
+	.featurebox p, .featurebox h1, .featurebox h2, .featurebox h3, .featurebox h4, .featurebox h5, .featurebox h6 {margin: 0 0 .3em;border-bottom: 1px solid #c00;color:#c00}
+	.featurebox p {border:none;margin: 0 0 1em;color:#444}
+	.featurebox a {font-weight:bold}
+
+	.thumbnail {margin: 0 0 0 10px;position:relative;z-index:9999;border: 1px solid #eee;float:right;width:100px;padding:5px;background:#fff}
+	.thumbnail img {border: 1px solid #000}
+	
+	.pagination {background: #f2f2f2;color:#666;padding: 4px 2px 4px 7px;border: 1px solid #ddd;margin: 0 0 1.5em}
+	.pagination p {position:relative;text-align:right}
+	.pagination p a:link, .pagination p a:visited, .pagination p a:hover, .pagination p a:active {text-decoration:none;background:#fff;padding:2px 5px;border: 1px solid #ccc}
+	.pagination p a:hover {background:#c00;color:#fff}
+	.pagination p span {text-decoration:none;background:#fff;padding:2px 5px;border: 1px solid #ccc;color:#ccc}
+	.pagination * {margin:0}
+	.pagination h4 {margin-top:-1.45em;padding:0;border:none}
+	
+	#resultslist-wrap {margin: 0 0 1.5em;font-size:92%}
+	#resultslist-wrap dt, #resultslist-wrap dl {margin: 0}
+	#resultslist-wrap dt {font: bold 85% arial;padding: 3px 0}
+	#resultslist-wrap li {padding: 0 0 1em;margin:0 0 0 1.2em;font: bold 145% arial}
+	#resultslist-wrap li dd {font: normal 73% arial}
+	#resultslist-wrap li dl {margin:0}
+	#resultslist-wrap dd {line-height:1.3}
+	#resultslist-wrap dd.filetype, #resultslist-wrap dd.date {color:#999;display:inline;padding-right:.5em}
+	
+	/* board_detail view */	
+	div.board_box dt {font-size:1.4em; font-weight: bold; } 
+	div.board_box dd.desc {margin: 1.2em 0 1.2em;  padding: .1em; } 
+	div.board_box dd.writer, div.board_box dd.date {color:#666;display:inline;padding-right:.5em} 
+	div.board_list button.icon_button2{float: right; height: 20px; width: 20px;}
+	
+	/* TABLES */
+	.table1 {border: 2px solid #900;border-collapse:collapse;width:100%}
+		.table1 td {background: #fff url("images/sprites.gif") repeat-x 0 -1600px;padding:3px;border: 1px solid #fff}
+		.table1 th {text-align:left;border: 1px solid #fff}
+		.table1 thead th {color:#fff;font-size:145%;background: #900 url("images/sprites.gif") repeat-x 0 -1300px;padding: 10px 6px}
+		.table1 tbody th {color:#fff;font-size:115%;background: #88b8db url("images/sprites.gif") repeat-x 0 -1400px;padding: 6px}
+		.table1 tbody th.sub {font-size:100%;color:#000;background: #efefef url("images/sprites.gif") repeat-x 0 -1500px;padding: 6px}
+
+
+	table.popTable {
+		font-family: verdana,arial,sans-serif;
+		font-size:11px;
+		color:#333333;
+		border-width: 1px;
+		border-color: #999999;
+		border-collapse: collapse;
+	}
+	table.popTable th {
+		background:#b5cfd2 url('images/cell-blue.jpg');
+		border-width: 1px;
+		padding: 6px;
+		border-style: solid;
+		border-color: #999999;
+	}
+	table.popTable td {
+		background:#dcddc0 url('images/cell-grey.jpg');
+		border-width: 1px;
+		padding: 4px;
+		border-style: solid;
+		border-color: #999999;
+	}
+	
+
+	/* TABLES - calendar */
+	.calendar {width:200px;font-size:92%}
+		.calendar td {text-align:center;border: 1px solid #ddd}
+		.calendar th {text-align:center}
+		.calendar thead th {padding: 3px 2px}
+		.calendar tbody th {padding: 2px}
+		.calendar tbody th.sub {padding: 2px}
+		
+	/* 'MORE' LINK - provides an accessible alternative to just using 'more' as a link at the end of paragraphs */
+		a.morelink:link, a.morelink:visited, a.morelink:hover, a.morelink:active {background: transparent url("images/sprites.gif") no-repeat 5px -500px;padding-left:21px}
+		a.morelink:hover {background: transparent url("images/sprites.gif") 5px -400px}
+		.morelink span {position:absolute;left:-9999px;width:900px}
+		
+	/* CODE - formatting for code inserted into body - more here: http://dizque.lacalabaza.net/temp/lipt/ */
+		ol.code {font-family: monospace;position:relative}
+		ol.code li {color: #666;margin-bottom: 1px}
+		ol.code code {color: #000;display: block}
+		ol.code .cmt {color: #4077d2}
+		li.tab0 code {padding-left: 4em}
+		li.tab1 code {padding-left: 8em}
+		li.tab2 code {padding-left: 12em}
+		li.tab3 code {padding-left: 16em}
+		li.tab4 code {padding-left: 20em}
+		li.tab5 code {padding-left: 24em}
+		ol.code li  {background: #f3f3f3 url("images/td_bg.gif") no-repeat 100% 100%}
+		p.note {margin: 1em;border: 1px solid #ddd;background: #f0f0f0;padding: 1em}
+
+/* SECONDARY NAVIGATION - vertical navigation */
+	#nav-secondary, #nav-secondary ul {position:static}
+	#nav-secondary, #nav-secondary li {list-style: none;margin:0;padding:0;background:#fff}
+	#nav-secondary {padding-top:0;border-top: 1px solid #ccc;margin-top: 1px}
+	#nav-secondary a {line-height:1.8;padding: 5px 0 5px 23px;background: #fff url("images/sprites.gif") no-repeat 10px -695px;font: bold 86% arial;display:block}
+	#nav-secondary a, #nav-secondary a:link, #nav-secondary a:visited, #nav-secondary a:hover, #nav-secondary a:active {text-decoration:none;cursor:pointer} 
+	#nav-secondary a:link {color:#000} 
+	#nav-secondary a:visited {color:#000} 
+	#nav-secondary a:hover {color:#c00;background: #fee url("images/sprites.gif") no-repeat 10px -695px} 
+	#nav-secondary li.active a:link, #nav-secondary li.active a:visited, #nav-secondary li.active a:hover, #nav-secondary li.active a:active {color:#c00} 
+	#nav-secondary li {border-top: 1px solid #fff;border-bottom: 1px solid #ccc}
+
+/* SECONDARY NAVIGATION - 2nd TIER */
+	#nav-secondary ul {margin: 0 0 1em 23px;padding:0}
+	#nav-secondary li.active li a, #nav-secondary li.active li a:link, #nav-secondary li.active li a:visited {line-height:1.5;background: #fff url("images/sprites.gif") no-repeat 0 -798px;padding:0 0 0 12px;font-weight:normal;width:auto;color:#000;width:130px;display:block}
+	#nav-secondary li.active li a:hover, #nav-secondary li.active li a:active {color: #c00}
+	#nav-secondary li.active li {border: none;margin:0}
+	
+	#nav-secondary li.active li.active a:link, 
+	#nav-secondary li.active li.active a:visited, 
+	#nav-secondary li.active li.active a:hover, 
+	#nav-secondary li.active li.active a:active {font-weight:bold}
+
+/* LAYOUT - FOOTER */
+/*
+#footer {clear:both;border-top: 1px solid #E3E8EE;padding: 10px 0 30px;font-size:86%;color:#999}
+*/
+#footer {clear:both; padding: 0;font-size:86%;color:#999}
+	#footer p {margin:0}
+	#footer a:link {color:#999}
+	
+/*
+	모듈 상세, 수정, 등록용 css
+*/
+#detail_form form { width: 100%; padding: 5px 0; color: #333333; font-family: Verdana, Geneva, sans-serif; font-size: 12px; }
+#detail_form fieldset { position: relative; margin-top: 0; padding: 10px; padding-top: 10px; background: #F6F6F6;  background: -webkit-gradient(linear, left top, left bottom, from(#EFEFEF), to(#FFFFFF)); background: -moz-linear-gradient(center top, #EFEFEF, #FFFFFF 100%); box-shadow: 3px 3px 10px #ccc; -moz-box-shadow: 3px 3px 10px #ccc; -webkit-box-shadow: 3px 3px 10px #ccc }
+#detail_form fieldset.sub { position: relative; margin-top: 15px; padding: 10px; padding-top: 10px; background: #F6F6F6;  background: -webkit-gradient(linear, left top, left bottom, from(#EFEFEF), to(#FFFFFF)); background: -moz-linear-gradient(center top, #EFEFEF, #FFFFFF 100%); box-shadow: 3px 3px 10px #ccc; -moz-box-shadow: 3px 3px 10px #ccc; -webkit-box-shadow: 3px 3px 10px #ccc }
+#detail_form fieldset #process_box   { margin-left: 160px; float: left;}
+#detail_form legend { padding: 6px 12px; position: absolute; left: 10px; top: -11px; background-color: #c00; color: white; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; box-shadow: 2px 2px 4px #888; -moz-box-shadow: 2px 2px 4px #888; -webkit-box-shadow: 2px 2px 4px #888; text-shadow: 1px 1px 1px #333; font-weight: bold; }
+#detail_form label {float: left; width: 140px; padding: 5px 20px 5px 0; text-align: right; height: 20px; line-height: 20px; font-weight: bold; }
+#detail_form .contact-method span {float: left; clear: left; display: block; width: 140px; padding: 5px 20px 5px 0; text-align: right; height: 20px; line-height: 20px; font-weight: bold; }
+
+#detail_form label.error { text-align: left; margin-left: 200px; color: #CC0000; padding: 0; height: auto; width: 208px; font-size: 11px }
+#detail_form input, #detail_form select { margin-left:5px; padding: 3px; float: left; width: 200px; border: 1px solid #d9d9d9; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; background-color: #FFFFFF;}
+#detail_form textarea  { padding: 3px; float: left; width: 938px; border: 1px solid #d9d9d9; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; background-color: #FFFFFF;}
+#detail_form .submit { width: 100px; float: right; margin-right: 37px; border: 0; padding: 5px 10px; background: #4F709F; color: white; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; box-shadow: 2px 2px 4px #888; -moz-box-shadow: 2px 2px 4px #888; -webkit-box-shadow: 2px 2px 4px #888; margin-bottom: 4px; text-shadow: 1px 1px 1px #333 }
+#detail_form select { width: 208px }
+#detail_form input:focus, #detail_form textarea:focus, #detail_form select:focus { background: white; border-color: #666 }
+#detail_form input.error { border: 1px solid #CC0000 }
+#detail_form p { overflow: hidden; margin-bottom: 0px }
+#detail_form p:first-of-type { padding-top: 10px }
+
+#detail_form  ul.checkingBox {display:inline-block;padding:5px 0;list-style:none;   padding-left:0px;}
+#detail_form  ul.checkingBox > li {float:left; padding:3px 0; width:160px; }
+#detail_form  ul.checkingBox > li > input {  padding: 3px; float: left; width: 20px; border: 0px solid #d9d9d9;background-color: #F6F6F6; }
+#detail_form  ul.checkingBox > li > div {width:140px; margin-top:-0px;}
+
+#detail_form  ul.fileBox {display:inline-block;padding:5px 0;list-style:none;   padding-left:0px;}
+#detail_form  ul.fileBox > li {float:left; padding:3px 0; width:450px; }
+#detail_form  ul.fileBox > li > div {width:400px; margin-top:-0px;}
+#detail_form  ul.fileBox > li > div > input {  padding: 3px; float: right; width: 320px; border: 0px solid #d9d9d9;background-color: #F6F6F6; }
+
+
+#detail_form .contact-method label { clear: none; width: auto }
+#detail_form .contact-method input { float: none; width: 20px }
+#detail_form .icon {display: block; float: left; margin: 4px 10px 0 0; font-weight: bold;}
+#detail_form fieldset2 { position: relative; margin-top: 0; padding: 10px; padding-top: 10px; background: #F6F6F6;  background: -webkit-gradient(linear, left top, left bottom, from(#EFEFEF), to(#FFFFFF)); background: -moz-linear-gradient(center top, #EFEFEF, #FFFFFF 100%); box-shadow: 3px 3px 10px #ccc; -moz-box-shadow: 3px 3px 10px #ccc; -webkit-box-shadow: 3px 3px 10px #ccc }
+#detail_form .content{padding: 3px; float: left; width: 200px; border: 1px solid #d9d9d9; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; background-color: #FFFFFF; overflow-y:scroll;overflow-x:hidden;font-size:12px;}
+
+#detail_form .icon_button {float: left; width: 20px; height: 20px; margin-left: 5px; margin-bottom: -5px; margin-top: 5px;}
+
+#detail_form .ui-slider { float: left; margin-top: 4px; width: 165px }
+#detail_form .slider-val { float: left; padding-left: 10px; margin-top: 4px; }
+
+/*
+	이슈 진행상황 등록 팝업
+*/
+div.issue-dialog form { width: 100%; padding: 5px 0; color: #333333; font-family: Verdana, Geneva, sans-serif; font-size: 12px; }
+div.issue-dialog label {float: left; width: 100px; padding: 5px 20px 5px 0; text-align: right; height: 20px; line-height: 20px; font-weight: bold; }
+div.issue-dialog .contact-method span {float: left; clear: left; display: block; width: 140px; padding: 5px 20px 5px 0; text-align: right; height: 20px; line-height: 20px; font-weight: bold; }
+div.issue-dialog input, div.issue-dialog select { padding: 3px; float: left; width: 200px; border: 1px solid #d9d9d9; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; background-color: #FFFFFF;}
+div.issue-dialog textarea  { padding: 3px; float: left; width: 450px; border: 1px solid #d9d9d9; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; background-color: #FFFFFF;}
+div.issue-dialog select { width: 208px }
+/* div.issue-dialog input:focus, div.issue-dialog textarea:focus, div.issue-dialog select:focus { background: white; border-color: #666 } */
+div.issue-dialog p { overflow: hidden; margin-bottom: 0px }
+div.issue-dialog .contact-method label { clear: none; width: auto }
+div.issue-dialog .contact-method input { float: none; width: 20px }
+
+#dialog-view-report td, #dialog-view-report th{border: solid 1px black; height: 25px; text-align: center;}
+#dialog-view-report th {background-color: #ddd; }
+#dialog-view-report td.summary{height: 240px; }
+#dialog-view-report td.summary textarea{border: 0px; }
+
+/*
+	모듈수정이력 등록 팝업
+*/
+div.module-dialog form { width: 100%; padding: 5px 0; color: #333333; font-family: Verdana, Geneva, sans-serif; font-size: 12px; }
+div.module-dialog label {float: left; width: 100px; padding: 5px 20px 5px 0; text-align: right; height: 20px; line-height: 20px; font-weight: bold; }
+div.module-dialog .contact-method span {float: left; display: block; width: 100px; padding: 5px 20px 5px 0; text-align: right; height: 20px; line-height: 20px; font-weight: bold; }
+div.module-dialog input, #dialog-module-history select { padding: 3px; float: left; width: 200px; border: 1px solid #d9d9d9; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; background-color: #FFFFFF;}
+div.module-dialog textarea  { padding: 3px; float: left; width: 450px; border: 1px solid #d9d9d9; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; background-color: #FFFFFF; margin-bottom: 10px;}
+div.module-dialog select { width: 208px }
+/* div.module-dialog input:focus, div.module-dialog textarea:focus, div.module-dialog select:focus { background: white; border-color: #666 } */
+div.module-dialog p { overflow: hidden; margin-bottom: 0px }
+div.module-dialog .contact-method label { clear: none; width: auto }
+div.module-dialog .contact-method input { float: none; width: 20px }
+div.module-dialog  ul.fileBox {display:inline-block;padding:5px 0;list-style:none;   padding-left:0px;}
+div.module-dialog  ul.fileBox > li {float:left; padding:3px 0; width:410px; }
+div.module-dialog  ul.fileBox > li > div {width:400px; margin-top:-0px;}
+div.module-dialog  ul.fileBox > li > div > input {  padding: 3px; float: right; width: 320px; border: 1px solid #d9d9d9;}
+div.module-dialog .icon {display: block; float: left; margin: 4px 10px 0 0; font-weight: bold;}
+div.module-dialog .icon_button {float: left; width: 20px; height: 20px; margin-left: 5px; margin-bottom: -5px; margin-top: 5px;}
+
+/*
+	crm용 팝업
+*/
+div.crm-dialog form { width: 100%; padding: 5px 0; color: #333333; font-family: Verdana, Geneva, sans-serif; font-size: 12px; }
+div.crm-dialog label {float: left; width: 100px; padding: 5px 20px 5px 0; text-align: right; height: 20px; line-height: 20px; font-weight: bold; }
+div.crm-dialog .contact-method span {float: left; display: block; width: 100px; padding: 5px 20px 5px 0; text-align: right; height: 20px; line-height: 20px; font-weight: bold; }
+div.crm-dialog input, div.crm-dialog select { padding: 3px; float: left; width: 200px; border: 1px solid #d9d9d9; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; background-color: #FFFFFF;}
+div.crm-dialog textarea  { padding: 3px; float: left; width: 450px; border: 1px solid #d9d9d9; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; background-color: #FFFFFF; margin-bottom: 10px;}
+div.crm-dialog select { width: 208px }
+/* div.crm-dialog input:focus, div.crm-dialog textarea:focus, div.crm-dialog select:focus { background: white; border-color: #666 } */
+div.crm-dialog p { overflow: hidden; margin-bottom: 0px }
+div.crm-dialog .contact-method label { clear: none; width: auto }
+div.crm-dialog .contact-method input { float: none; width: 20px }
+
+
+div.crm_popup_form form { width: 100%; padding: 5px 0; color: #333333; font-family: Verdana, Geneva, sans-serif; font-size: 12px; }
+div.crm_popup_form fieldset { position: relative; margin-top: 0; padding: 10px; padding-top: 10px; background: #F6F6F6;  background: -webkit-gradient(linear, left top, left bottom, from(#EFEFEF), to(#FFFFFF)); background: -moz-linear-gradient(center top, #EFEFEF, #FFFFFF 100%); box-shadow: 3px 3px 10px #ccc; -moz-box-shadow: 3px 3px 10px #ccc; -webkit-box-shadow: 3px 3px 10px #ccc }
+div.crm_popup_form legend { padding: 6px 12px; position: absolute; left: 10px; top: -11px; background-color: #c00; color: white; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; box-shadow: 2px 2px 4px #888; -moz-box-shadow: 2px 2px 4px #888; -webkit-box-shadow: 2px 2px 4px #888; text-shadow: 1px 1px 1px #333; font-weight: bold; }
+div.crm_popup_form label {float: left; width: 140px; padding: 5px 20px 5px 0; text-align: right; height: 20px; line-height: 20px; font-weight: bold; }
+div.crm_popup_form input, div.crm_popup_form select { margin-left:5px; padding: 3px; float: left; width: 135px; border: 1px solid #d9d9d9; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; background-color: #FFFFFF;}
+div.crm_popup_form input:focus, div.crm_popup_form textarea:focus, div.crm_popup_form select:focus { background: white; border-color: #666 }
+div.crm_popup_form p { overflow: hidden; margin-bottom: 0px }
+
+
+/*
+	FAQ QNA용 팝업
+*/
+div.faq-dialog form { width: 100%; padding: 5px 0; color: #333333; font-family: Verdana, Geneva, sans-serif; font-size: 12px; }
+div.faq-dialog label {float: left; width: 60px; padding: 5px 20px 5px 0; text-align: right; height: 20px; line-height: 20px; font-weight: bold; }
+div.faq-dialog .contact-method span {float: left; display: block; width: 60px; padding: 5px 20px 5px 0; text-align: right; height: 20px; line-height: 20px; font-weight: bold; }
+div.faq-dialog input, div.faq-dialog select { padding: 3px; float: left; width: 500px; border: 1px solid #d9d9d9; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; background-color: #FFFFFF;}
+div.faq-dialog textarea  { padding: 3px; float: left; width: 500px; border: 1px solid #d9d9d9; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; background-color: #FFFFFF; margin-bottom: 10px;}
+div.faq-dialog select { width: 208px }
+/* div.crm-dialog input:focus, div.crm-dialog textarea:focus, div.crm-dialog select:focus { background: white; border-color: #666 } */
+div.faq-dialog p { overflow: hidden; margin-bottom: 0px }
+div.faq-dialog p.contact-method label { clear: none; width: auto }
+div.faq-dialog p.contact-method input { float: none; width: 20px }
+
+/*
+	사용자 등록 팝업
+*/
+#dialog-add-employee form { width: 100%; padding: 5px 0; color: #333333; font-family: Verdana, Geneva, sans-serif; font-size: 12px; }
+#dialog-add-employee label {float: left; width: 100px; padding: 5px 20px 5px 0; text-align: right; height: 20px; line-height: 20px; font-weight: bold; }
+#dialog-add-employee input, #dialog-add-employee select { padding: 3px; float: left; width: 250px; border: 1px solid #d9d9d9; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; background-color: #FFFFFF;}
+#dialog-add-employee select { width: 258px }
+#dialog-add-employee input:focus,  #dialog-add-employee select:focus { background: white; border-color: #666 }
+#dialog-add-employee p { overflow: hidden; margin-bottom: 0px }
+
+
+/*
+	사용자 수정 팝업
+*/
+#dialog-modify-employee form { width: 100%; padding: 5px 0; color: #333333; font-family: Verdana, Geneva, sans-serif; font-size: 12px; }
+#dialog-modify-employee label {float: left; width: 100px; padding: 5px 20px 5px 0; text-align: right; height: 20px; line-height: 20px; font-weight: bold; }
+#dialog-modify-employee input, #dialog-modify-employee select { padding: 3px; float: left; width: 250px; border: 1px solid #d9d9d9; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; background-color: #FFFFFF;}
+#dialog-modify-employee select { width: 258px }
+#dialog-modify-employee input:focus,  #dialog-modify-employee select:focus { background: white; border-color: #666 }
+#dialog-modify-employee p { overflow: hidden; margin-bottom: 0px }
+
+/*
+	고객사 팝업
+*/
+#dialog-customer form { width: 100%; padding: 5px 0; color: #333333; font-family: Verdana, Geneva, sans-serif; font-size: 12px; }
+#dialog-customer label {float: left; width: 80px; padding: 5px 20px 5px 0; text-align: right; height: 20px; line-height: 20px; font-weight: bold; }
+#dialog-customer input, #dialog-add-employee select { padding: 3px; float: left; width: 250px; border: 1px solid #d9d9d9; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; background-color: #FFFFFF;}
+#dialog-customer select { width: 258px }
+#dialog-customer input:focus, 
+#dialog-customer  ul.telBox > li > input:focus, 
+#dialog-customer  ul.emailBox > li > input:focus, 
+
+#dialog-customer select:focus { background: white; border-color: #666 }
+#dialog-customer p { overflow: hidden; margin-bottom: 0px }
+#dialog-customer  ul.telBox {display:inline-block;padding:5px 0;list-style:none;   padding-left:0px;}
+#dialog-customer  ul.telBox > li {float:left; padding:3px 0; width:60px; }
+#dialog-customer  ul.telBox > li > input {float: left; width: 40px; border: 1px solid #d9d9d9; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; background-color: #FFFFFF;}
+
+#dialog-customer  ul.emailBox {display:inline-block;padding:5px 0;list-style:none;   padding-left:0px;}
+#dialog-customer  ul.emailBox > li {float:left; padding:3px 0; width:110px; }
+#dialog-customer  ul.emailBox > li > input {float: left; width: 100px; border: 1px solid #d9d9d9; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; background-color: #FFFFFF;}
+
+
+/*
+	고객사 팝업
+*/
+#dialog-manager form { width: 100%; padding: 5px 0; color: #333333; font-family: Verdana, Geneva, sans-serif; font-size: 12px; }
+#dialog-manager label {float: left; width: 80px; padding: 5px 20px 5px 0; text-align: right; height: 20px; line-height: 20px; font-weight: bold; }
+#dialog-manager input, #dialog-add-employee select { padding: 3px; float: left; width: 250px; border: 1px solid #d9d9d9; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; background-color: #FFFFFF;}
+#dialog-manager select { width: 258px }
+#dialog-manager input:focus, #dialog-manager  ul.telBox > li > input:focus, , #dialog-manager  ul.emailBox > li > input:focus, 
+#dialog-manager select:focus { background: white; border-color: #666 }
+#dialog-manager p { overflow: hidden; margin-bottom: 0px }
+#dialog-manager  ul.telBox {display:inline-block;padding:5px 0;list-style:none;   padding-left:0px;}
+#dialog-manager  ul.telBox > li {float:left; padding:3px 0; width:60px; }
+#dialog-manager  ul.telBox > li > input {float: left; width: 40px; border: 1px solid #d9d9d9; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; background-color: #FFFFFF;}
+#dialog-manager  ul.emailBox {display:inline-block;padding:5px 0;list-style:none;   padding-left:0px;}
+#dialog-manager  ul.emailBox > li {float:left; padding:3px 0; width:120px; }
+#dialog-manager  ul.emailBox > li > input {float: left; width: 100px; border: 1px solid #d9d9d9; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; background-color: #FFFFFF;}
+
+
+/*
+	모듈 상세, 수정, 등록용 css
+*/
+#option_form form { width: 98%; padding: 0px 10px; color: #333333; font-family: Verdana, Geneva, sans-serif; font-size: 12px; }
+/*
+#option_form fieldset { position: relative; padding: 10px; padding-top: 0; padding-top: 25px; margin-bottom: 30px; background: #F6F6F6; -webkit-border-radius: 8px; -moz-border-radius: 8px; border-radius: 8px; background: -webkit-gradient(linear, left top, left bottom, from(#EFEFEF), to(#FFFFFF)); background: -moz-linear-gradient(center top, #EFEFEF, #FFFFFF 100%); box-shadow: 3px 3px 10px #ccc; -moz-box-shadow: 3px 3px 10px #ccc; -webkit-box-shadow: 3px 3px 10px #ccc }
+*/
+#option_form fieldset { position: relative; margin-top: 25px; padding: 20px 5px 10px 10px ; background: #F6F6F6;  background: -webkit-gradient(linear, left top, left bottom, from(#EFEFEF), to(#FFFFFF)); background: -moz-linear-gradient(center top, #EFEFEF, #FFFFFF 100%); box-shadow: 3px 3px 10px #ccc; -moz-box-shadow: 3px 3px 10px #ccc; -webkit-box-shadow: 3px 3px 10px #ccc }
+#option_form fieldset .first { position: relative; margin-top: 10px; padding: 10px; padding-top: 15px; background: #F6F6F6;  background: -webkit-gradient(linear, left top, left bottom, from(#EFEFEF), to(#FFFFFF)); background: -moz-linear-gradient(center top, #EFEFEF, #FFFFFF 100%); box-shadow: 3px 3px 10px #ccc; -moz-box-shadow: 3px 3px 10px #ccc; -webkit-box-shadow: 3px 3px 10px #ccc }
+#option_form legend {width:150px; text-align:left; padding: 6px 12px; position: absolute; left: 10px; top: -15px; background-color: #c00; color: white; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; box-shadow: 2px 2px 4px #888; -moz-box-shadow: 2px 2px 4px #888; -webkit-box-shadow: 2px 2px 4px #888; text-shadow: 1px 1px 1px #333; font-weight: bold; }
+#option_form label, #option_form .contact-method span { float: left; clear: left; display: block; width: 200px;  padding: 5px 20px 5px 0; text-align: right; height: 20px; line-height: 20px; font-weight: bold; }
+#option_form label.error { text-align: left; margin-left: 200px; color: #CC0000; padding: 0; height: auto; width: 208px; font-size: 11px }
+#option_form input, #option_form textarea, #option_form select { padding: 3px; float: left; width: 200px; border: 1px solid #d9d9d9; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; background-color: #FFFFFF;}
+#option_form span { padding-left:10px; height: 20px; line-height: 20px; }
+#option_form span .br_type br { padding-left:20px; height: 20px; line-height: 20px; }
+#option_form .submit { width: 100px; float: right; margin-right: 37px; border: 0; padding: 5px 10px; background: #4F709F; color: white; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; box-shadow: 2px 2px 4px #888; -moz-box-shadow: 2px 2px 4px #888; -webkit-box-shadow: 2px 2px 4px #888; margin-bottom: 4px; text-shadow: 1px 1px 1px #333 }
+#option_form select { width: 208px }
+#option_form input:focus, #option_form textarea:focus, #option_form select:focus { background: white; border-color: #666 }
+#option_form input.error { border: 1px solid #CC0000 }
+#option_form p { overflow: hidden; margin-bottom: 0px }
+#option_form p:first-of-type { padding-top: 10px }
+#option_form .contact-method label { clear: none; width: auto }
+#option_form .contact-method input { float: none; width: 20px }
+#detail_form .icon {display: block; float: left; margin: 4px 10px 0 0; font-weight: bold; }
+
+#option_form .ui-slider { float: left; margin-top: 4px; width: 165px }
+#option_form .slider-val { float: left; padding-left: 10px; margin-top: 4px }
+
+/*
+	로그인
+*/
+#login_form form { margin: 200px auto; width: 458px; color: #333333; font-family: Verdana, Geneva, sans-serif; font-size: 12px; }
+#login_form fieldset { position: relative; padding: 10px; padding-top: 10px; background: #F6F6F6;  background: -webkit-gradient(linear, left top, left bottom, from(#EFEFEF), to(#FFFFFF)); background: -moz-linear-gradient(center top, #EFEFEF, #FFFFFF 100%); box-shadow: 3px 3px 10px #ccc; -moz-box-shadow: 3px 3px 10px #ccc; -webkit-box-shadow: 3px 3px 10px #ccc }
+#login_form legend { padding: 6px 12px; position: absolute; left: 15px; top: -11px; background-color: #c00; color: white; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; box-shadow: 2px 2px 4px #888; -moz-box-shadow: 2px 2px 4px #888; -webkit-box-shadow: 2px 2px 4px #888; text-shadow: 1px 1px 1px #333; font-weight: bold; }
+#login_form label {float: left; width: 140px; padding: 5px 20px 5px 0; text-align: right; height: 20px; line-height: 20px; font-weight: bold; }
+#login_form input { padding: 3px; float: left; width: 200px; border: 1px solid #d9d9d9; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; background-color: #FFFFFF;}
+#login_form input:focus { background: white; border-color: #666 }
+#login_form p { overflow: hidden; margin-bottom: 0px }
+#login_form p:first-of-type { padding-top: 10px }
+
+/*
+	일정등록 팝업
+*/
+#dialog-add-schedule form { width: 100%; padding: 5px 0; color: #333333; font-family: Verdana, Geneva, sans-serif; font-size: 12px; }
+#dialog-add-schedule label {float: left; width: 100px; padding: 5px 20px 5px 0; text-align: right; height: 20px; line-height: 20px; font-weight: bold; }
+#dialog-add-schedule label.time {margin-top: -3px; width:0px;  }
+#dialog-add-schedule input { padding: 3px; float: left; width: 318px; border: 1px solid #d9d9d9; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; background-color: #FFFFFF;}
+#dialog-add-schedule input.title { width: 320px; }
+#dialog-add-schedule input.date { width: 150px; }
+#dialog-add-schedule input.time { width: 60px; }
+#dialog-add-schedule select { padding: 3px; float: left; width: 60px; border: 1px solid #d9d9d9; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; background-color: #FFFFFF;}
+#dialog-add-schedule input:focus,  #dialog-add-schedule select:focus { background: white; border-color: #666 }
+#dialog-add-schedule textarea  { padding: 3px; float: left; width: 318px; border: 1px solid #d9d9d9; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; background-color: #FFFFFF; margin-bottom: 10px;}
+#dialog-add-schedule p { overflow: hidden; margin-bottom: 0px }
+#dialog-add-schedule .contact-method span {float: left; display: block; width: 100px; padding: 5px 20px 5px 0; text-align: right; height: 20px; line-height: 20px; font-weight: bold; }
+#dialog-add-schedule .contact-method label { clear: none; width: auto }
+#dialog-add-schedule .contact-method input { float: none; width: 20px }

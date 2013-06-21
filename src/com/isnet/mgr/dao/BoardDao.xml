@@ -1,0 +1,423 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.isnet.mgr.dao.BoardDao">
+	
+	<insert id="insert_faq_01" parameterType="map">
+		INSERT INTO
+			TB_FAQ(PRODUCT_NO, FAQ_QUESTION, FAQ_ANSWER, FAQ_HIT, CREATE_DATE, FILE_NAME)
+		VALUES
+			(#{PRODUCT_NO}, #{FAQ_QUESTION}, #{FAQ_ANSWER}, #{FAQ_HIT}, #{CREATE_DATE}, #{FILE_NAME})
+	</insert>
+	
+	<select id="select_faq_01" parameterType="map" resultType="int">
+		SELECT 
+			COUNT(*)
+		FROM 
+			TB_FAQ A
+		<if test="rules != null">
+			<where>
+				<foreach collection="rules" item="item">
+					<choose>
+						<when test="item.op == 'cn'">
+							${groupOp} A.${item.column} LIKE CONCAT('%', #{item.value}, '%')
+						</when>
+						<when test="item.op == 'eq'">
+							${groupOp} A.${item.column} = #{item.value}
+						</when>
+						<when test="item.op == 'ne'">
+							${groupOp} A.${item.column} != #{item.value}
+						</when>
+					</choose>
+				</foreach>
+			</where>
+		</if>
+	</select>
+	
+	<select id="select_faq_02" parameterType="map" resultType="hashmap">
+		SELECT
+			A.FAQ_NO, A.PRODUCT_NO, B.PRODUCT_NAME, A.FAQ_QUESTION, A.FAQ_ANSWER, A.FAQ_HIT, A.CREATE_DATE, A.FILE_NAME
+		FROM
+			TB_FAQ A, TB_PRODUCT B
+		<where>
+			<if test="rules != null">
+				<foreach collection="rules" item="item">
+					<choose>
+						<when test="item.op == 'cn'">
+							${groupOp} A.${item.column} LIKE CONCAT('%', #{item.value}, '%')
+						</when>
+						<when test="item.op == 'eq'">
+							${groupOp} A.${item.column} = #{item.value}
+						</when>
+						<when test="item.op == 'ne'">
+							${groupOp} A.${item.column} != #{item.value}
+						</when>
+					</choose>
+				</foreach>
+			</if>
+			AND A.PRODUCT_NO = B.PRODUCT_NO
+		</where>
+		ORDER BY
+			A.FAQ_NO DESC
+		LIMIT 
+			#{BEGIN_INDEX}, #{ROWS}	
+	</select>
+	
+	<select id="select_faq_03" parameterType="map" resultType="hashmap">
+		SELECT
+			A.FAQ_NO, A.PRODUCT_NO, B.PRODUCT_NAME, A.FAQ_QUESTION, A.FAQ_ANSWER, A.FAQ_HIT, A.CREATE_DATE, A.FILE_NAME
+		FROM
+			TB_FAQ A, TB_PRODUCT B
+		WHERE
+			A.FAQ_NO = #{FAQ_NO}
+			AND A.PRODUCT_NO = B.PRODUCT_NO
+	</select>
+	
+	<update id="update_faq_01" parameterType="map">
+		UPDATE 
+			TB_FAQ
+		<set>
+			<if test="PRODUCT_NO != null">
+				PRODUCT_NO = #{PRODUCT_NO},
+			</if>
+			<if test="FAQ_QUESTION != null">
+				FAQ_QUESTION = #{FAQ_QUESTION},
+			</if>
+			<if test="FAQ_ANSWER != null">
+				FAQ_ANSWER = #{FAQ_ANSWER},
+			</if>
+			<if test="FILE_NAME != null">
+				FILE_NAME = #{FILE_NAME},
+			</if>
+		</set>
+		WHERE
+			FAQ_NO = #{FAQ_NO}			
+	</update>
+	
+	
+	<insert id="insert_qna_01" parameterType="map">
+		INSERT INTO
+			TB_QNA_QUESTION(PRODUCT_NO, QUESTION_WRITER, QUESTION_TITLE, QUESTION_CONTENT, QUESTION_HIT, CREATE_DATE)
+		VALUES
+			(#{PRODUCT_NO}, #{QUESTION_WRITER}, #{QUESTION_TITLE}, #{QUESTION_CONTENT}, #{QUESTION_HIT}, #{CREATE_DATE})
+	</insert>
+	
+	<insert id="insert_qna_02" parameterType="map">
+		INSERT INTO
+			TB_QNA_ANSWER(QUESTION_NO, ANSWER_WRITER, ANSWER_CONTENT, CREATE_DATE)
+		VALUES
+			(#{QUESTION_NO}, #{ANSWER_WRITER}, #{ANSWER_CONTENT}, #{CREATE_DATE})
+	</insert>	
+	
+	<select id="select_qna_01" parameterType="map" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			TB_QNA_QUESTION
+		<if test="searchField != null">
+		<where>
+			<choose>
+				<when test="searchOper eq 'cn'">
+					${searchField} LIKE CONCAT('%', #{searchString}, '%')
+				</when>
+				<when test="searchOper eq 'eq'">
+					${searchField} =  #{searchString}
+				</when>
+			</choose>
+		</where>
+		</if>
+	</select>
+	
+	<select id="select_qna_02" parameterType="map" resultType="hashmap">
+		SELECT
+			A.QUESTION_NO, A.PRODUCT_NO, A.QUESTION_WRITER, A.QUESTION_TITLE, A.QUESTION_HIT, A.CREATE_DATE, B.EMPLOYEE_NAME, C.PRODUCT_NAME,
+			(SELECT COUNT(*) FROM TB_QNA_ANSWER X WHERE X.QUESTION_NO = A.QUESTION_NO) ANSWER_CNT
+		FROM
+			TB_QNA_QUESTION A, TB_EMPLOYEE B, TB_PRODUCT C
+		WHERE
+		<choose>
+		<when test="searchField != null">
+			<choose>
+				<when test="searchOper eq 'cn'">
+					${searchField} LIKE CONCAT('%', #{searchString}, '%')
+				</when>
+				<when test="searchOper eq 'eq'">
+					${searchField} =  #{searchString}
+				</when>
+			</choose>
+			AND A.PRODUCT_NO = C.PRODUCT_NO
+			AND A.QUESTION_WRITER = B.EMPLOYEE_NO
+		</when>
+		<otherwise>
+			A.PRODUCT_NO = C.PRODUCT_NO
+			AND A.QUESTION_WRITER = B.EMPLOYEE_NO
+		</otherwise>
+		</choose>
+		ORDER BY
+			A.QUESTION_NO DESC
+		LIMIT 
+			#{BEGIN_INDEX}, #{ROWS}	
+	</select>
+	
+	<select id="select_qna_03" parameterType="map" resultType="hashmap">
+		SELECT
+			A.QUESTION_NO, A.PRODUCT_NO, A.QUESTION_WRITER, A.QUESTION_TITLE, A.QUESTION_CONTENT, A.QUESTION_HIT, A.CREATE_DATE, B.EMPLOYEE_NAME, C.PRODUCT_NAME
+		FROM
+			TB_QNA_QUESTION A, TB_EMPLOYEE B, TB_PRODUCT C
+		WHERE
+			A.QUESTION_NO = #{QUESTION_NO}
+			AND A.QUESTION_WRITER = B.EMPLOYEE_NO
+			AND A.PRODUCT_NO = C.PRODUCT_NO
+	</select>
+	
+	<select id="select_qna_04" parameterType="map" resultType="hashmap">
+		SELECT
+			A.ANSWER_NO, A.QUESTION_NO, A.ANSWER_WRITER, A.ANSWER_CONTENT, A.CREATE_DATE, B.EMPLOYEE_NAME
+		FROM
+			TB_QNA_ANSWER A, TB_EMPLOYEE B
+		WHERE
+			A.QUESTION_NO = #{QUESTION_NO}
+			AND A.ANSWER_WRITER = B.EMPLOYEE_NO
+		ORDER BY
+			A.ANSWER_NO ASC	
+	</select>	
+	
+	<delete id="delete_qna_01" parameterType="map">
+		DELETE FROM 
+			TB_QNA_QUESTION
+		WHERE
+			QUESTION_NO = ${QUESTION_NO}
+	</delete>
+	
+	<delete id="delete_qna_02" parameterType="map">
+		DELETE FROM
+			TB_QNA_ANSWER
+		WHERE
+			ANSWER_NO = #{ANSWER_NO}
+	</delete>	
+	
+	<update id="update_qna_01" parameterType="map">
+		UPDATE 
+			TB_QNA_QUESTION
+		<set>
+			<if test="PRODUCT_NO != null">
+				PRODUCT_NO = #{PRODUCT_NO},
+			</if>
+			<if test="QUESTION_TITLE != null">
+				QUESTION_TITLE = #{QUESTION_TITLE},
+			</if>
+			<if test="QUESTION_CONTENT != null">
+				QUESTION_CONTENT = #{QUESTION_CONTENT},
+			</if>
+		</set>
+		WHERE
+			QUESTION_NO = #{QUESTION_NO}
+	</update>
+	
+	<update id="update_qna_02" parameterType="map">
+		UPDATE 
+			TB_QNA_ANSWER
+		<set>
+			<if test="ANSWER_CONTENT != null">
+				ANSWER_CONTENT = #{ANSWER_CONTENT},
+			</if>
+		</set>
+		WHERE
+			ANSWER_NO = #{ANSWER_NO}
+	</update>
+	
+	
+	<insert id="insert_form_01" parameterType="map">
+		INSERT INTO
+			TB_FORM(FORM_NAME, FILE_NAME, FORM_DESC, IS_USED, CREATE_DATE, IS_FORM)
+		VALUES
+			(#{FORM_NAME}, #{FILE_NAME}, #{FORM_DESC}, #{IS_USED}, #{CREATE_DATE}, #{IS_FORM})
+	</insert>
+	
+	<select id="select_form_01" parameterType="map" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			TB_FORM
+		WHERE
+			IS_USED = 'Y'
+			AND IS_FORM = #{IS_FORM}
+	</select>
+	
+	<select id="select_form_02" parameterType="map" resultType="hashmap">
+		SELECT
+			FORM_NO, FORM_NAME, FORM_DESC, FILE_NAME, CREATE_DATE
+		FROM
+			TB_FORM
+		WHERE
+			IS_USED = 'Y'
+			AND IS_FORM = #{IS_FORM}
+		ORDER BY
+			FORM_NO 
+		LIMIT 
+			#{BEGIN_INDEX}, #{ROWS}	
+	</select>
+	
+	<select id="select_form_03" parameterType="map" resultType="hashmap">
+		SELECT
+			FORM_NO, FORM_NAME, FORM_DESC, FILE_NAME, CREATE_DATE, IS_FORM
+		FROM 
+			TB_FORM
+		WHERE
+			FORM_NO = #{FORM_NO}
+	</select>
+	
+	<update id="update_form_01">
+		UPDATE
+			TB_FORM
+		<set>
+			<if test="FORM_NAME != null">
+				FORM_NAME = #{FORM_NAME},
+			</if>
+			<if test="FORM_DESC != null">
+				FORM_DESC = #{FORM_DESC},
+			</if>
+			<if test="FILE_NAME != null">
+				FILE_NAME = #{FILE_NAME},
+			</if>
+			<if test="IS_USED != null">
+				IS_USED = #{IS_USED},
+			</if>
+			<if test="IS_FORM != null">
+				IS_FORM = #{IS_FORM},
+			</if>
+		</set>
+		WHERE
+			FORM_NO = #{FORM_NO}
+	</update>
+	
+	
+	<insert id="insert_sug_01" parameterType="map">
+		INSERT INTO
+			TB_SUGGESTION(CATEGORY_NAME, SUGGESTION_WRITER, SUGGESTION_TITLE, SUGGESTION_CONTENT, CREATE_DATE)
+		VALUES
+			(#{CATEGORY_NAME}, #{SUGGESTION_WRITER}, #{SUGGESTION_TITLE}, #{SUGGESTION_CONTENT}, #{CREATE_DATE})
+	</insert>
+	
+	<insert id="insert_sug_02" parameterType="map">
+		INSERT INTO
+			TB_SUGGESTION_COMMENTS(SUGGESTION_NO, COMMENT_WRITER, COMMENT_CONTENT, CREATE_DATE)
+		VALUES
+			(#{SUGGESTION_NO}, #{COMMENT_WRITER}, #{COMMENT_CONTENT}, #{CREATE_DATE})
+	</insert>	
+	
+	<select id="select_sug_01" parameterType="map" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			TB_SUGGESTION
+		<if test="searchField != null">
+		<where>
+			<choose>
+				<when test="searchOper eq 'cn'">
+					${searchField} LIKE CONCAT('%', #{searchString}, '%')
+				</when>
+				<when test="searchOper eq 'eq'">
+					${searchField} =  #{searchString}
+				</when>
+			</choose>
+		</where>
+		</if>
+	</select>
+	
+	<select id="select_sug_02" parameterType="map" resultType="hashmap">
+		SELECT
+			A.SUGGESTION_NO, A.SUGGESTION_WRITER, A.SUGGESTION_TITLE, A.CREATE_DATE, B.EMPLOYEE_NAME, A.CATEGORY_NAME,
+			(SELECT COUNT(*) FROM TB_SUGGESTION_COMMENTS X WHERE X.SUGGESTION_NO = A.SUGGESTION_NO) COMMENTS_CNT
+		FROM
+			TB_SUGGESTION A, TB_EMPLOYEE B
+		WHERE
+		<choose>
+			<when test="searchField != null">
+				<choose>
+					<when test="searchOper eq 'cn'">
+						${searchField} LIKE CONCAT('%', #{searchString}, '%')
+					</when>
+					<when test="searchOper eq 'eq'">
+						${searchField} =  #{searchString}
+					</when>
+				</choose>
+				AND A.SUGGESTION_WRITER = B.EMPLOYEE_NO
+			</when>
+			<otherwise>
+				A.SUGGESTION_WRITER = B.EMPLOYEE_NO
+			</otherwise>
+		</choose>
+		ORDER BY
+			A.SUGGESTION_NO DESC
+		LIMIT 
+			#{BEGIN_INDEX}, #{ROWS}	
+	</select>
+	
+	<select id="select_sug_03" parameterType="map" resultType="hashmap">
+		SELECT
+			A.SUGGESTION_NO, A.SUGGESTION_WRITER, A.SUGGESTION_TITLE, A.SUGGESTION_CONTENT, A.CREATE_DATE, B.EMPLOYEE_NAME, A.CATEGORY_NAME
+		FROM
+			TB_SUGGESTION A, TB_EMPLOYEE B
+		WHERE
+			A.SUGGESTION_NO = #{SUGGESTION_NO}
+			AND A.SUGGESTION_WRITER = B.EMPLOYEE_NO
+	</select>
+	
+	<select id="select_sug_04" parameterType="map" resultType="hashmap">
+		SELECT
+			A.COMMENT_NO, A.SUGGESTION_NO, A.COMMENT_WRITER, A.COMMENT_CONTENT, A.CREATE_DATE, B.EMPLOYEE_NAME
+		FROM
+			TB_SUGGESTION_COMMENTS A, TB_EMPLOYEE B
+		WHERE
+			A.SUGGESTION_NO = #{SUGGESTION_NO}
+			AND A.COMMENT_WRITER = B.EMPLOYEE_NO
+		ORDER BY
+			A.COMMENT_NO ASC	
+	</select>	
+	
+	<delete id="delete_sug_01" parameterType="map">
+		DELETE FROM 
+			TB_SUGGESTION
+		WHERE
+			SUGGESTION_NO = ${SUGGESTION_NO}
+	</delete>
+	
+	<delete id="delete_sug_02" parameterType="map">
+		DELETE FROM
+			TB_SUGGESTION_COMMENTS
+		WHERE
+			COMMENT_NO = #{COMMENT_NO}
+	</delete>	
+	
+	<update id="update_sug_01" parameterType="map">
+		UPDATE 
+			TB_SUGGESTION
+		<set>
+			<if test="CATEGORY_NAME != null">
+				CATEGORY_NAME = #{CATEGORY_NAME},
+			</if>
+			<if test="SUGGESTION_TITLE != null">
+				SUGGESTION_TITLE = #{SUGGESTION_TITLE},
+			</if>
+			<if test="SUGGESTION_CONTENT != null">
+				SUGGESTION_CONTENT = #{SUGGESTION_CONTENT},
+			</if>
+		</set>
+		WHERE
+			SUGGESTION_NO = #{SUGGESTION_NO}
+	</update>
+	
+	<update id="update_sug_02" parameterType="map">
+		UPDATE 
+			TB_SUGGESTION_COMMENTS
+		<set>
+			<if test="COMMENT_CONTENT != null">
+				COMMENT_CONTENT = #{COMMENT_CONTENT},
+			</if>
+		</set>
+		WHERE
+			COMMENT_NO = #{COMMENT_NO}
+	</update>
+	
+</mapper>

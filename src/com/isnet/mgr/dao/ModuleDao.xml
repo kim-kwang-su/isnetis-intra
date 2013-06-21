@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.isnet.mgr.dao.ModuleDao">
+	
+	<!-- 모듈을 등록합니다. -->
+	<insert id="insert_module_01" parameterType="map" useGeneratedKeys="true" keyProperty="MODULE_NO">
+		INSERT INTO 
+			TB_MODULE(MODULE_NO, MODULE_NAME, PRODUCT_NO, LOCATION_NO, MODULE_STATE, MODULE_DESC, UPPER_MODULE_NAME)
+		VALUES
+			(#{MODULE_NO}, #{MODULE_NAME}, #{PRODUCT_NO}, #{LOCATION_NO}, 'NEW', #{MODULE_DESC}, #{UPPER_MODULE_NAME})
+	</insert>
+	
+	<!-- 모듈 변경 내역을 등록합니다. -->
+	<insert id="insert_module_02" parameterType="map" useGeneratedKeys="true" keyProperty="MODULE_HISTORY_NO">
+			INSERT INTO
+				TB_MODULE_HISTORY(MODULE_HISTORY_NO, FILE_VERSION, SAVE_PATH, UPDATE_DATE, MODULE_NO, EMPLOYEE_NO, HASH_VALUE, UPDATE_MEMO, X86_RELEASE, X64_RELEASE, X86_DEBUG, X64_DEBUG)
+			VALUES
+				(#{MODULE_HISTORY_NO}, #{FILE_VERSION}, #{SAVE_PATH}, #{UPDATE_DATE}, #{MODULE_NO}, #{EMPLOYEE_NO}, #{HASH_VALUE}, #{UPDATE_MEMO}, #{X86_RELEASE}, #{X64_RELEASE}, #{X86_DEBUG}, #{X64_DEBUG})
+	</insert>
+	
+	<!-- 전체 데이터 건 수 조회 -->
+	<select id="select_module_01" parameterType="map" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			TB_MODULE_HISTORY A, TB_MODULE B
+		WHERE
+			A.MODULE_NO = B.MODULE_NO
+			<if test="rules != null ">
+				<choose>
+					<when test="groupOp == 'AND'">
+						<foreach collection="rules" item="item" open="AND(" close=")" separator=" AND ">
+							<choose>
+								<when test="item.op == 'cn'">
+									${item.column} LIKE CONCAT('%', #{item.value}, '%')
+								</when>
+								<when test="item.op == 'eq'">
+									<choose>
+										<when test="item.column == 'CUSTOMER_NO'">
+											 A.MODULE_HISTORY_NO IN (SELECT MODULE_HISTORY_NO FROM TB_CUSTOMER_APPLY_MODULES WHERE CUSTOMER_NO = #{item.value}) 
+										</when>
+										<otherwise>
+											${item.column} = #{item.value}
+										</otherwise>
+									</choose>
+								</when>
+							</choose>
+						</foreach>
+					</when>
+					<when test="groupOp == 'OR'">
+						<foreach collection="rules" item="item" open="AND(" close=")" separator=" OR ">
+							<choose>
+								<when test="item.op == 'cn'">
+									${item.column} LIKE CONCAT('%', #{item.value}, '%')
+								</when>
+								<when test="item.op == 'eq'">
+									<choose>
+										<when test="item.column == 'CUSTOMER_NO'">
+											 A.MODULE_HISTORY_NO IN (SELECT MODULE_HISTORY_NO FROM TB_CUSTOMER_APPLY_MODULES WHERE CUSTOMER_NO = #{item.value}) 
+										</when>
+										<otherwise>
+											${item.column} = #{item.value}
+										</otherwise>
+									</choose>
+								</when>
+							</choose>
+						</foreach>
+					</when>
+				</choose>
+			</if>
+	</select>
+	
+	<!-- 모듈 변경 이력을 반환합니다. -->
+	<select id="select_module_02" parameterType="map" resultType="hashmap">
+		SELECT
+			A.MODULE_NO, A.MODULE_HISTORY_NO, A.UPDATE_DATE, C.PRODUCT_NAME, B.MODULE_NAME, A.UPDATE_MEMO, A.FILE_VERSION, D.EMPLOYEE_NAME,
+			(SELECT GROUP_CONCAT(Y.CUSTOMER_NAME) FROM  TB_CUSTOMER_APPLY_MODULES X, TB_CUSTOMER Y WHERE X.MODULE_HISTORY_NO = A.MODULE_HISTORY_NO AND X.CUSTOMER_NO = Y.CUSTOMER_NO) CUSTOMER_NAME,
+			 E.FOLDER_PATH
+			
+		FROM
+			TB_MODULE_HISTORY A, TB_MODULE B, TB_PRODUCT C, TB_EMPLOYEE D, TB_FILE_PATH E
+		WHERE
+			A.MODULE_NO = B.MODULE_NO
+			AND B.PRODUCT_NO = C.PRODUCT_NO
+			AND A.EMPLOYEE_NO = D.EMPLOYEE_NO
+			AND B.LOCATION_NO = E.LOCATION_NO
+			<if test="rules != null ">
+				<choose>
+					<when test="groupOp == 'AND'">
+						<foreach collection="rules" item="item" open="AND(" close=")" separator=" AND ">
+							<choose>
+								<when test="item.op == 'cn'">
+									${item.column} LIKE CONCAT('%', #{item.value}, '%')
+								</when>
+								<when test="item.op == 'eq'">
+									<choose>
+										<when test="item.column == 'CUSTOMER_NO'">
+											 A.MODULE_HISTORY_NO IN (SELECT MODULE_HISTORY_NO FROM TB_CUSTOMER_APPLY_MODULES WHERE CUSTOMER_NO = #{item.value}) 
+										</when>
+										<otherwise>
+											${item.column} = #{item.value}
+										</otherwise>
+									</choose>
+								</when>
+							</choose>
+						</foreach>
+					</when>
+					<when test="groupOp == 'OR'">
+						<foreach collection="rules" item="item" open="AND(" close=")" separator=" OR ">
+							<choose>
+								<when test="item.op == 'cn'">
+									${item.column} LIKE CONCAT('%', #{item.value}, '%')
+								</when>
+								<when test="item.op == 'eq'">
+									<choose>
+										<when test="item.column == 'CUSTOMER_NO'">
+											 A.MODULE_HISTORY_NO IN (SELECT MODULE_HISTORY_NO FROM TB_CUSTOMER_APPLY_MODULES WHERE CUSTOMER_NO = #{item.value}) 
+										</when>
+										<otherwise>
+											${item.column} = #{item.value}
+										</otherwise>
+									</choose>
+								</when>
+							</choose>
+						</foreach>
+					</when>
+				</choose>
+			</if>
+		<choose>
+			<when test="SIDX != ''">
+			ORDER BY 
+				${SIDX} ${SORD}
+			</when>
+			<otherwise>
+				ORDER BY A.MODULE_HISTORY_NO DESC
+			</otherwise>
+		</choose>
+		LIMIT 
+			#{BEGIN_INDEX}, #{ROWS}
+	</select>
+	
+	<!-- 모듈의 상세정보를 조회합니다. -->
+	<select id="select_module_03" parameterType="map" resultType="hashmap">
+		SELECT
+			A.MODULE_NO, A.MODULE_HISTORY_NO, B.PRODUCT_NO, B.PRODUCT_NAME, A.MODULE_NAME, A.MODULE_DESC, C.UPDATE_DATE, D.LOCATION_NO, D.FOLDER_PATH, C.FILE_VERSION, E.EMPLOYEE_NAME, C.UPDATE_MEMO  
+		FROM
+			TB_MODULE A, TB_PRODUCT B, TB_MODULE_HISTORY C, TB_FILE_PATH D, TB_EMPLOYEE E
+		WHERE
+			A.MODULE_NO = #{MODULE_NO}
+			AND A.PRODUCT_NO = B.PRODUCT_NO
+			AND A.MODULE_HISTORY_NO = C.MODULE_HISTORY_NO
+			AND A.LOCATION_NO = D.LOCATION_NO
+			AND C.EMPLOYEE_NO = E.EMPLOYEE_NO
+	</select>
+	
+	<!-- 해당 모듈의 적용 고객사 정보를 반환합니다. -->
+	<select id="select_module_04" parameterType="map" resultType="hashmap">
+		SELECT 
+			CUSTOMER_NO, CUSTOMER_NAME
+		FROM 
+			TB_CUSTOMER
+		WHERE 
+			CUSTOMER_NO IN (SELECT CUSTOMER_NO FROM TB_CUSTOMER_APPLY_MODULES WHERE MODULE_HISTORY_NO = #{MODULE_HISTORY_NO})
+	</select>
+	
+	<!-- 해당 모듈의 수정 이력을 반환합니다. -->
+	<select id="select_module_05" parameterType="map" resultType="hashmap">
+		SELECT 
+			A.MODULE_HISTORY_NO, A.MODULE_NO, A.UPDATE_DATE, A.FILE_VERSION, B.EMPLOYEE_NAME, A.UPDATE_MEMO,
+			A.X86_RELEASE, A.X86_DEBUG, A.X64_DEBUG, A.X64_RELEASE,
+			(SELECT GROUP_CONCAT(Y.CUSTOMER_NAME) FROM  TB_CUSTOMER_APPLY_MODULES X, TB_CUSTOMER Y WHERE X.MODULE_HISTORY_NO = A.MODULE_HISTORY_NO AND X.CUSTOMER_NO = Y.CUSTOMER_NO) CUSTOMER_NAME
+		FROM 
+			TB_MODULE_HISTORY A, TB_EMPLOYEE B
+		WHERE
+			A.MODULE_NO = #{MODULE_NO}
+			AND A.EMPLOYEE_NO = B.EMPLOYEE_NO
+		ORDER BY
+			A.MODULE_HISTORY_NO DESC
+		LIMIT
+			0, 20
+	</select>
+	
+	<!-- 모듈의 태그정보를 반환합니다. -->
+	<select id="select_module_06" parameterType="map" resultType="hashmap">
+		SELECT
+			TAG_NO, TAG_VALUE
+		FROM 
+			TB_TAG
+		WHERE
+			MODULE_HISTORY_NO = #{MODULE_HISTORY_NO}
+	</select>
+	
+	<select id="select_module_07" parameterType="map" resultType="hashmap">
+		SELECT 
+			A.MODULE_HISTORY_NO, A.MODULE_NO, A.UPDATE_DATE, A.FILE_VERSION, A.UPDATE_MEMO, A.SAVE_PATH, A.X86_RELEASE, A.X86_DEBUG, A.X64_DEBUG, A.X64_RELEASE
+		FROM 
+			TB_MODULE_HISTORY A
+		WHERE
+			A.MODULE_HISTORY_NO = #{MODULE_HISTORY_NO}
+	</select>
+	
+	<!-- 설치경로 정보를 반환합니다. -->
+	<select id="select_module_08" resultType="hashmap">
+		SELECT
+			LOCATION_NO, FOLDER_NAME, FOLDER_PATH, FOLDER_DEPTH
+		FROM 
+			TB_FILE_PATH
+		ORDER BY 
+			LOCATION_NO ASC
+	</select>
+	
+	<select id="select_module_09" parameterType="map" resultType="hashmap">
+		SELECT
+			A.MODULE_NO, B.MODULE_HISTORY_NO, A.MODULE_NAME, B.FILE_VERSION, B.SAVE_PATH, B.UPDATE_MEMO, B.UPDATE_DATE, C.EMPLOYEE_NAME
+		,   B.X86_RELEASE, B.X86_DEBUG, B.X64_DEBUG, B.X64_RELEASE
+		FROM 
+			TB_MODULE A, TB_MODULE_HISTORY B, TB_EMPLOYEE C
+		WHERE
+			A.PRODUCT_NO = #{PRODUCT_NO}
+			AND LOCATION_NO = #{LOCATION_NO}
+			AND A.MODULE_HISTORY_NO = B.MODULE_HISTORY_NO
+			AND B.EMPLOYEE_NO = C.EMPLOYEE_NO
+		ORDER BY
+			A.MODULE_NAME ASC
+		LIMIT 
+			#{BEGIN_INDEX}, #{ROWS}
+	</select>
+	
+	<select id="select_module_10" parameterType="map" resultType="int">
+		SELECT
+			count(*)
+		FROM 
+			TB_MODULE A, TB_MODULE_HISTORY B
+		WHERE
+			A.PRODUCT_NO = #{PRODUCT_NO}
+			AND LOCATION_NO = #{LOCATION_NO}
+			AND A.MODULE_HISTORY_NO = B.MODULE_HISTORY_NO
+	</select>
+	
+	<select id="select_module_11" parameterType="map" resultType="hashmap">
+		SELECT 
+			B.MODULE_NO, B.MODULE_HISTORY_NO, B.MODULE_NAME, C.FILE_VERSION, C.UPDATE_DATE, C.UPDATE_MEMO, C.SAVE_PATH, 
+			C.X86_RELEASE, C.X86_DEBUG, C.X64_DEBUG, C.X64_RELEASE, D.FOLDER_PATH
+		FROM(
+			SELECT
+				DISTINCT MODULE_NO
+			FROM 
+				TB_CUSTOMER_APPLY_MODULES A
+			WHERE
+				A.CUSTOMER_NO = #{CUSTOMER_NO}
+				AND A.PRODUCT_NO = #{PRODUCT_NO}) A, TB_MODULE B, TB_MODULE_HISTORY C, TB_FILE_PATH D
+		WHERE
+			A.MODULE_NO = B.MODULE_NO
+			AND B.MODULE_HISTORY_NO = C.MODULE_HISTORY_NO
+			AND B.LOCATION_NO = D.LOCATION_NO
+		ORDER BY
+			B.LOCATION_NO ASC, B.MODULE_NAME ASC
+	</select>
+	
+	<select id="select_module_12" parameterType="map" resultType="int">
+		SELECT 
+			COUNT(*)
+		FROM(
+			SELECT
+				DISTINCT MODULE_NO
+			FROM 
+				TB_CUSTOMER_APPLY_MODULES A
+			WHERE
+				A.CUSTOMER_NO = #{CUSTOMER_NO}
+				AND A.PRODUCT_NO =  #{PRODUCT_NO}) X
+	</select>
+		
+	<!-- 모듈을 등록합니다. -->
+	<insert id="insert_module_03" parameterType="map" >
+		INSERT INTO 
+			TB_CUSTOMER_APPLY_MODULES(CUSTOMER_NO, MODULE_NO, MODULE_HISTORY_NO, PRODUCT_NO, DEPLOY_DATE, EMPLOYEE_NO)
+		VALUES
+			(#{CUSTOMER_NO}, #{MODULE_NO}, #{MODULE_HISTORY_NO}, #{PRODUCT_NO}, NOW(), #{EMPLOYEE_NO})
+	</insert>
+	
+	<delete id="delete_module_01" parameterType="map" >
+		DELETE FROM TB_CUSTOMER_APPLY_MODULES
+		WHERE MODULE_HISTORY_NO =  #{MODULE_HISTORY_NO}
+	</delete>
+	
+	<select id="select_module_13" parameterType="map" resultType="hashmap">
+		SELECT
+				T1.CUSTOMER_NO, T2.CUSTOMER_NAME
+		FROM 
+				TB_CUSTOMER_APPLY_MODULES T1
+		,		TB_CUSTOMER T2
+		WHERE 
+			T1.CUSTOMER_NO = T2.CUSTOMER_NO
+		AND
+			T1.MODULE_HISTORY_NO = #{MODULE_HISTORY_NO}
+		ORDER BY T2.CUSTOMER_NAME
+	</select>
+	
+	<!-- <select id="select_module_14" parameterType="map" resultType="hashmap">
+		SELECT
+			LOCATION_NO, FOLDER_PATH
+		FROM 
+			TB_FILE_PATH
+		WHERE 
+			LOCATION_NO = #{LOCATION_NO}
+	</select> -->
+	
+	<select id="select_module_14" parameterType="map" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM 
+			TB_MODULE A
+		WHERE
+		<foreach collection="rules" item="item" open="(" close=")" separator=" AND ">
+			<choose>
+				<when test="item.column == 'A.PRODUCT_NO'">
+					A.PRODUCT_NO = #{item.value}
+				</when>
+				<when test="item.column == 'A.MODULE_NAME'">
+					A.UPPER_MODULE_NAME LIKE CONCAT('%', #{item.value}, '%')
+				</when>
+			</choose>
+		</foreach>
+	</select>
+	
+	<select id="select_module_15" parameterType="map" resultType="hashmap">
+		SELECT 
+			A.MODULE_NO, A.MODULE_HISTORY_NO, A.MODULE_NAME, A.PRODUCT_NO, B.PRODUCT_NAME, A.LOCATION_NO, C.FOLDER_PATH, D.FILE_VERSION, D.UPDATE_DATE, D.UPDATE_MEMO
+		FROM 
+			TB_MODULE A, TB_PRODUCT B, TB_FILE_PATH C, TB_MODULE_HISTORY D
+		WHERE 
+			A.PRODUCT_NO = B.PRODUCT_NO 
+			AND A.LOCATION_NO = C.LOCATION_NO 
+			AND A.MODULE_HISTORY_NO = D.MODULE_HISTORY_NO
+			<foreach collection="rules" item="item" open="AND(" close=")" separator=" AND ">
+				<choose>
+					<when test="item.column == 'A.PRODUCT_NO'">
+						A.PRODUCT_NO = #{item.value}
+					</when>
+					<when test="item.column == 'A.MODULE_NAME'">
+						A.UPPER_MODULE_NAME LIKE CONCAT('%', #{item.value}, '%')
+					</when>
+				</choose>
+			</foreach>
+		ORDER BY
+			A.MODULE_NAME ASC
+		LIMIT 
+			#{BEGIN_INDEX}, #{ROWS}
+	</select>
+	
+	<!-- 가장 최신의 변경이력번호를 모듈에 저장한다. -->
+	<update id="update_module_01" parameterType="map">
+		UPDATE
+			TB_MODULE
+		SET
+			MODULE_HISTORY_NO = (SELECT MAX(MODULE_HISTORY_NO) FROM TB_MODULE_HISTORY 
+								  WHERE MODULE_NO = #{MODULE_NO})											
+		WHERE
+			MODULE_NO = #{MODULE_NO}
+	</update>
+	
+	<update id="update_module_02" parameterType="map">
+		UPDATE 
+			TB_MODULE
+		<set>
+			<if test="MODULE_NAME != null">
+				MODULE_NAME = #{MODULE_NAME},
+			</if>
+			<if test="PRODUCT_NO != null">
+				PRODUCT_NO = #{PRODUCT_NO},
+			</if>
+			<if test="LOCATION_NO != null">
+				LOCATION_NO = #{LOCATION_NO},
+			</if>
+			<if test="MODULE_DESC != null">
+				MODULE_DESC = #{MODULE_DESC},
+			</if>
+		</set>
+		WHERE
+			MODULE_NO = #{MODULE_NO}
+	</update>
+	
+	<update id="update_module_03" parameterType="map">
+		UPDATE
+			TB_MODULE_HISTORY
+		<set>
+			<if test="UPDATE_MEMO != null">
+				UPDATE_MEMO = #{UPDATE_MEMO},
+			</if>
+			<if test="FILE_VERSION != null">
+				FILE_VERSION = #{FILE_VERSION},
+			</if>
+			<if test="X86_RELEASE != null">
+				X86_RELEASE = #{X86_RELEASE},
+			</if>
+			<if test="X64_RELEASE != null">
+				X64_RELEASE = #{X64_RELEASE},
+			</if>
+			<if test="X86_DEBUG != null">
+				X86_DEBUG = #{X86_DEBUG},
+			</if>
+			<if test="X64_DEBUG != null">
+				X64_DEBUG = #{X64_DEBUG},
+			</if> 
+		</set>
+		WHERE
+			MODULE_HISTORY_NO = #{MODULE_HISTORY_NO}	
+	</update>
+	
+</mapper>

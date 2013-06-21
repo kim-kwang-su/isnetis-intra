@@ -1,0 +1,514 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.isnet.mgr.dao.CRMDao">
+
+	<insert id="insert_crm_01" parameterType="map">
+		INSERT INTO CRM_COMPANY
+			(COMPANY_NAME, COMPANY_TEL, COMPANY_FAX, COMPANY_ADDR, IS_USED)
+		VALUES
+			(#{COMPANY_NAME}, #{COMPANY_TEL}, #{COMPANY_FAX}, #{COMPANY_ADDR}, 'Y')
+	</insert>
+	
+	<insert id="insert_crm_02_01" parameterType="map" useGeneratedKeys="true" keyProperty="CUSTOMER_NO">
+		INSERT INTO 
+			CRM_PERSON (CUSTOMER_NO, CUSTOMER_NAME, CUSTOMER_AGE, CUSTOMER_JOB, CUSTOMER_GUBUN, REF_CUSTOMER_NO, IS_USED, CREATE_DATE)
+		VALUES
+			(#{CUSTOMER_NO}, #{CUSTOMER_NAME}, #{CUSTOMER_AGE}, #{CUSTOMER_JOB}, #{CUSTOMER_GUBUN}, #{REF_CUSTOMER_NO}, 'Y', NOW())
+	</insert>
+	
+	<insert id="insert_crm_02_02" parameterType="map">
+		INSERT INTO
+			CRM_PERSON_ADDITION
+			(CUSTOMER_NO, CUSTOMER_PHONE, CUSTOMER_EMAIL, CUSTOMER_HOME_TEL, CUSTOMER_HOME_ADDR,
+			 COMPANY_NO, CUSTOMER_DEPT, CUSTOMER_TEAM, CUSTOMER_POSITION, CUSTOMER_COMPANY_TEL, ISNET_IMPRESSION, LAST_VISITED_DATE,
+			 FIRST_COMPANY_NAME, SECOND_COMPANY_NAME, THIRD_COMPANY_NAME, 
+			 CUSTOMER_BLOOD, CUSTOMER_HEIGHT, CUSTOMER_WEIGHT, CUSTOMER_CAR, CUSTOMER_HOMETOWN, MARRIED_YN, HOBBY, HOBBY_GRADE,
+			 GRADUATE_SCHOOL_NAME, UNIVERSITY_NAME, MAJOR_NAME, HIGH_SCHOOL_NAME, MIDDLE_SCHOOL_NAME, PRIMARY_SCHOOL_NAME, CUSTOMER_ETC)
+		VALUES
+			(#{CUSTOMER_NO}, #{CUSTOMER_PHONE}, #{CUSTOMER_EMAIL}, #{CUSTOMER_HOME_TEL}, #{CUSTOMER_HOME_ADDR},
+			 #{COMPANY_NO}, #{CUSTOMER_DEPT}, #{CUSTOMER_TEAM}, #{CUSTOMER_POSITION}, #{CUSTOMER_COMPANY_TEL}, #{ISNET_IMPRESSION}, #{LAST_VISITED_DATE},
+			 #{FIRST_COMPANY_NAME}, #{SECOND_COMPANY_NAME}, #{THIRD_COMPANY_NAME}, 
+			 #{CUSTOMER_BLOOD}, #{CUSTOMER_HEIGHT}, #{CUSTOMER_WEIGHT}, #{CUSTOMER_CAR}, #{CUSTOMER_HOMETOWN}, #{MARRIED_YN}, #{HOBBY}, #{HOBBY_GRADE},
+			 #{GRADUATE_SCHOOL_NAME}, #{UNIVERSITY_NAME}, #{MAJOR_NAME}, #{HIGH_SCHOOL_NAME}, #{MIDDLE_SCHOOL_NAME}, #{PRIMARY_SCHOOL_NAME}, #{CUSTOMER_ETC})
+	</insert>
+	
+	<insert id="insert_crm_02_03" parameterType="map">
+		INSERT INTO
+			CRM_CALENDAR(CUSTOMER_NO, MEMORIAL_DATE, MEMORIAL_DATE_GUBUN, IS_LUNAR_DATE, IS_LEAP_MONTH)
+		VALUES
+			(#{CUSTOMER_NO}, #{MEMORIAL_DATE}, #{MEMORIAL_DATE_GUBUN}, #{IS_LUNAR_DATE}, #{IS_LEAP_MONTH})
+	</insert>
+
+	<insert id="insert_crm_03" parameterType="map">
+		INSERT INTO 
+			CRM_VISITED_SHEET(COMPANY_NO, CUSTOMER_NO, VISITED_DATE, VISITED_GUBUN, VISITED_MEMO, IS_USED, CREATE_DATE)
+		VALUES
+			(#{COMPANY_NO}, #{CUSTOMER_NO}, #{VISITED_DATE}, #{VISITED_GUBUN}, #{VISITED_MEMO}, #{IS_USED}, #{CREATE_DATE})
+		<selectKey keyProperty="SHEET_NO" resultType="int">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	
+	<insert id="insert_crm_04" parameterType="map">
+		INSERT INTO
+			CRM_VISITED_EMPLOYEE(SHEET_NO, EMPLOYEE_NO)
+		VALUES
+			(#{SHEET_NO}, #{EMPLOYEE_NO})
+	</insert>
+	
+	<select id="select_crm_01" resultType="hashmap">
+		 SELECT 
+		 	COMPANY_NO, COMPANY_NAME, COMPANY_TEL, COMPANY_FAX, COMPANY_ADDR 
+		 FROM 
+		 	CRM_COMPANY 
+		 WHERE
+		 	IS_USED = 'Y'
+		 ORDER BY 
+		 	COMPANY_NAME ASC 
+	</select>
+	
+	<select id="select_crm_02" parameterType="map" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			CRM_PERSON A, CRM_PERSON_ADDITION B
+		WHERE
+			A.IS_USED = 'Y'
+			AND A.CUSTOMER_NO = B.CUSTOMER_NO
+		<if test="_SEARCH">
+			<choose>
+				<when test="SEARCH_OPER == 'cn'">
+					AND ${SEARCH_FIELD} LIKE CONCAT('%', #{SEARCH_STRING}, '%')
+				</when>
+				<when test="SEARCH_OPER == 'eq'">
+					AND ${SEARCH_FIELD} = #{SEARCH_STRING}
+				</when>
+				<when test="SEARCH_OPER == 'ne'">
+					AND ${SEARCH_FIELD} != #{SEARCH_STRING}
+				</when>
+			</choose>
+		</if>
+	</select>
+	
+	<select id="select_crm_03" parameterType="map" resultType="hashmap">
+		SELECT
+			A.CUSTOMER_NO, A.CUSTOMER_NAME, B.COMPANY_NO, C.COMPANY_NAME, B.CUSTOMER_DEPT, B.CUSTOMER_POSITION, B.CUSTOMER_COMPANY_TEL,  B.CUSTOMER_PHONE, C.COMPANY_FAX,
+			B.CUSTOMER_EMAIL, B.LAST_VISITED_DATE
+		FROM 
+			CRM_PERSON A, CRM_PERSON_ADDITION B, CRM_COMPANY C
+		WHERE
+			A.IS_USED = 'Y'
+			AND A.CUSTOMER_NO = B.CUSTOMER_NO
+			AND B.COMPANY_NO = C.COMPANY_NO
+		<if test="_SEARCH">
+			<choose>
+				<when test="SEARCH_OPER == 'cn'">
+					AND ${SEARCH_FIELD} LIKE CONCAT('%', #{SEARCH_STRING}, '%')
+				</when>
+				<when test="SEARCH_OPER == 'eq'">
+					AND ${SEARCH_FIELD} = #{SEARCH_STRING}
+				</when>
+				<when test="SEARCH_OPER == 'ne'">
+					AND ${SEARCH_FIELD} != #{SEARCH_STRING}
+				</when>
+			</choose>
+		</if>
+		<choose>
+			<when test="SIDX != ''">
+			ORDER BY 
+				${SIDX} ${SORD}
+			</when>
+			<otherwise>
+				ORDER BY A.CUSTOMER_NAME 
+			</otherwise>
+		</choose>
+		LIMIT 
+			#{BEGIN_INDEX}, #{ROWS}	
+	</select>
+	
+	<select id="select_crm_04" parameterType="map" resultType="hashmap">
+		SELECT 
+			A.CUSTOMER_NO, A.CUSTOMER_NAME, B.COMPANY_NO, B.CUSTOMER_EMAIL, B.CUSTOMER_PHONE
+		FROM
+			CRM_PERSON A, CRM_PERSON_ADDITION B
+		WHERE
+			A.IS_USED = 'Y'
+			AND A.CUSTOMER_NO = B.CUSTOMER_NO
+		<if test="COMPANY_NO != null">
+			AND B.COMPANY_NO = #{COMPANY_NO}
+		</if>
+	</select>
+	
+	<select id="select_crm_05" parameterType="map" resultType="int">
+		SELECT 
+			COUNT(*)
+		FROM 
+			CRM_VISITED_SHEET A
+		WHERE
+			A.VISITED_DATE &gt; #{START_DATE} 
+			AND A.IS_USED = 'Y'
+			AND A.VISITED_DATE &lt; #{END_DATE}
+			<if test="COMPANY_NO != null">
+			AND A.COMPANY_NO = #{COMPANY_NO}
+			</if>
+			<if test="EMPLOYEE_NO != null">
+			AND A.SHEET_NO IN (SELECT SHEET_NO FROM CRM_VISITED_EMPLOYEE WHERE EMPLOYEE_NO = #{EMPLOYEE_NO})
+			</if>
+	</select>
+	
+	<select id="select_crm_06" parameterType="map" resultType="hashmap">
+		SELECT
+			A.SHEET_NO, A.CUSTOMER_NO, A.COMPANY_NO, B.COMPANY_NAME, C.CUSTOMER_NAME,  A.VISITED_DATE, A.VISITED_MEMO, 
+			CONCAT(DATEDIFF(CURDATE(), VISITED_DATE), '일') DATE_GAP, VISITED_GUBUN
+		FROM
+			CRM_VISITED_SHEET A, CRM_COMPANY B, CRM_PERSON C
+		WHERE
+			A.VISITED_DATE &gt; #{START_DATE} AND A.VISITED_DATE &lt; #{END_DATE}
+			AND A.IS_USED = 'Y'
+			<if test="COMPANY_NO != null">
+			AND A.COMPANY_NO = #{COMPANY_NO} 
+			</if>
+			<if test="EMPLOYEE_NO != null">
+			AND A.SHEET_NO IN (SELECT SHEET_NO FROM CRM_VISITED_EMPLOYEE WHERE EMPLOYEE_NO = #{EMPLOYEE_NO})
+			</if>
+			AND A.COMPANY_NO = B.COMPANY_NO
+			AND A.CUSTOMER_NO = C.CUSTOMER_NO
+		<choose>
+			<when test="SIDX != ''">
+			ORDER BY 
+				${SIDX} ${SORD}
+			</when>
+			<otherwise>
+				ORDER BY A.VISITED_DATE DESC
+			</otherwise>
+		</choose>
+		LIMIT 
+			#{BEGIN_INDEX}, #{ROWS}	
+	</select>
+	
+	<select id="select_crm_07" parameterType="int" resultType="string">
+		SELECT 
+			B.EMPLOYEE_NAME
+		FROM 
+			CRM_VISITED_EMPLOYEE A, TB_EMPLOYEE B
+		WHERE
+			A.SHEET_NO = #{SHEET_NO}
+			AND A.EMPLOYEE_NO = B.EMPLOYEE_NO
+		ORDER BY
+			B.EMPLOYEE_NAME
+	</select>
+	
+	<select id="select_crm_08" parameterType="map" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			CRM_COMPANY
+		WHERE
+			IS_USED = 'Y'
+		<if test="_SEARCH">
+			<choose>
+				<when test="SEARCH_OPER == 'cn'">
+					AND ${SEARCH_FIELD} LIKE CONCAT('%', #{SEARCH_STRING}, '%')
+				</when>
+				<when test="SEARCH_OPER == 'eq'">
+					AND ${SEARCH_FIELD} = #{SEARCH_STRING}
+				</when>
+				<when test="SEARCH_OPER == 'ne'">
+					AND ${SEARCH_FIELD} != #{SEARCH_STRING}
+				</when>
+			</choose>
+		</if>
+	</select>
+	
+	<select id="select_crm_09" parameterType="map" resultType="hashmap">
+		SELECT
+			COMPANY_NO, COMPANY_NAME, COMPANY_TEL, COMPANY_FAX, COMPANY_ADDR, IS_USED
+		FROM
+			CRM_COMPANY
+		WHERE
+			IS_USED = 'Y'
+		<if test="_SEARCH">
+			<choose>
+				<when test="SEARCH_OPER == 'cn'">
+					AND ${SEARCH_FIELD} LIKE CONCAT('%', #{SEARCH_STRING}, '%')
+				</when>
+				<when test="SEARCH_OPER == 'eq'">
+					AND ${SEARCH_FIELD} = #{SEARCH_STRING}
+				</when>
+				<when test="SEARCH_OPER == 'ne'">
+					AND ${SEARCH_FIELD} != #{SEARCH_STRING}
+				</when>
+			</choose>
+		</if>
+		<choose>
+			<when test="SIDX != ''">
+			ORDER BY 
+				${SIDX} ${SORD}
+			</when>
+			<otherwise>
+				ORDER BY COMPANY_NAME
+			</otherwise>
+		</choose>
+		LIMIT
+			#{BEGIN_INDEX}, #{ROWS}	
+	</select>
+	
+	<select id="select_crm_10_01" parameterType="map" resultType="hashmap">
+		SELECT
+			CUSTOMER_NO, CUSTOMER_NAME, CUSTOMER_AGE, CUSTOMER_JOB, CUSTOMER_GUBUN, REF_CUSTOMER_NO
+		FROM
+			CRM_PERSON
+		WHERE
+			CUSTOMER_NO = #{CUSTOMER_NO}
+	</select>
+	
+	<select id="select_crm_10_02" parameterType="map" resultType="hashmap">
+		SELECT
+			CUSTOMER_NO, CUSTOMER_PHONE, CUSTOMER_EMAIL, CUSTOMER_HOME_TEL, CUSTOMER_HOME_ADDR,
+			COMPANY_NO, CUSTOMER_DEPT, CUSTOMER_TEAM, CUSTOMER_POSITION, CUSTOMER_COMPANY_TEL, ISNET_IMPRESSION, LAST_VISITED_DATE,
+			FIRST_COMPANY_NAME, SECOND_COMPANY_NAME, THIRD_COMPANY_NAME, 
+			CUSTOMER_BLOOD, CUSTOMER_HEIGHT, CUSTOMER_WEIGHT, CUSTOMER_CAR, CUSTOMER_HOMETOWN, MARRIED_YN, HOBBY, HOBBY_GRADE,
+			GRADUATE_SCHOOL_NAME, UNIVERSITY_NAME, MAJOR_NAME, HIGH_SCHOOL_NAME, MIDDLE_SCHOOL_NAME, PRIMARY_SCHOOL_NAME, CUSTOMER_ETC
+		FROM 
+			CRM_PERSON_ADDITION
+		WHERE 
+			CUSTOMER_NO = #{CUSTOMER_NO}
+	</select>
+	
+	<select id="select_crm_10_03" parameterType="map" resultType="hashmap">
+		SELECT
+			MEMORIAL_DATE, MEMORIAL_DATE_GUBUN, IS_LUNAR_DATE, IS_LEAP_MONTH
+		FROM
+			CRM_CALENDAR
+		WHERE
+			CUSTOMER_NO = #{CUSTOMER_NO}
+	</select>
+	
+	<select id="select_crm_11" parameterType="map" resultType="hashmap">
+		SELECT
+			CUSTOMER_NO, CUSTOMER_NAME, CUSTOMER_AGE, CUSTOMER_JOB, CUSTOMER_GUBUN, REF_CUSTOMER_NO
+		FROM
+			CRM_PERSON
+		WHERE
+			REF_CUSTOMER_NO = #{REF_CUSTOMER_NO}
+			AND IS_USED = 'Y'
+	</select>	
+	
+	<select id="select_crm_12" parameterType="map" resultType="hashmap">
+		SELECT
+			A.CUSTOMER_NO, B.CUSTOMER_NAME, C.CUSTOMER_POSITION, A.MEMORIAL_DATE, A.MEMORIAL_DATE_GUBUN, A.IS_LUNAR_DATE, A.IS_LEAP_MONTH
+		FROM
+			CRM_CALENDAR A, CRM_PERSON B, CRM_PERSON_ADDITION C
+		WHERE
+			A.CUSTOMER_NO = B.CUSTOMER_NO
+			AND A.CUSTOMER_NO = C.CUSTOMER_NO
+			AND A.MEMORIAL_DATE LIKE CONCAT(#{MONTH}, '%') 
+			AND IS_LUNAR_DATE = #{IS_LUNAR_DATE}
+	</select>
+	
+	<select id="select_crm_13" parameterType="map" resultType="hashmap">
+		SELECT
+			A.CUSTOMER_NO, B.CUSTOMER_NAME, C.CUSTOMER_POSITION, A.MEMORIAL_DATE, A.MEMORIAL_DATE_GUBUN, A.IS_LUNAR_DATE, A.IS_LEAP_MONTH
+		FROM
+			CRM_CALENDAR A, CRM_PERSON B, CRM_PERSON_ADDITION C
+		WHERE
+			A.CUSTOMER_NO = B.CUSTOMER_NO
+			AND A.CUSTOMER_NO = C.CUSTOMER_NO
+			AND ( A.MEMORIAL_DATE LIKE CONCAT(#{FIRST_MONTH}, '%') 
+				  OR A.MEMORIAL_DATE LIKE CONCAT(#{SECOND_MONTH}, '%')
+				  OR A.MEMORIAL_DATE LIKE CONCAT(#{THIRED_MONTH}, '%')) 
+			AND IS_LUNAR_DATE = #{IS_LUNAR_DATE}
+	</select>
+	
+	
+	
+	<delete id="delete_crm_01" parameterType="map">
+		DELETE FROM
+			CRM_VISITED_EMPLOYEE
+		WHERE 
+			SHEET_NO = #{SHEET_NO}
+	</delete>
+	
+	<delete id="delete_crm_03" parameterType="map">
+		DELETE FROM
+			CRM_CALENDAR
+		WHERE 
+			CUSTOMER_NO = #{CUSTOMER_NO}
+	</delete>
+	
+	<update id="update_crm_01" parameterType="map">
+		UPDATE 
+			CRM_VISITED_SHEET
+		<set>
+			<if test="COMPANY_NO != null">
+				COMPANY_NO = #{COMPANY_NO},
+			</if>
+			<if test="COMPANY_NO != null">
+				CUSTOMER_NO = #{CUSTOMER_NO},
+			</if>
+			<if test="COMPANY_NO != null">
+				VISITED_DATE = #{VISITED_DATE},
+			</if>
+			<if test="COMPANY_NO != null">
+				VISITED_GUBUN = #{VISITED_GUBUN},
+			</if>
+			<if test="COMPANY_NO != null">
+				VISITED_MEMO = #{VISITED_MEMO},
+			</if>
+			<if test="IS_USED != null">
+				IS_USED = #{IS_USED},
+			</if>
+		</set>
+		WHERE
+			SHEET_NO = #{SHEET_NO}
+	</update>
+	
+	<update id="update_crm_02_01" parameterType="map">
+		UPDATE
+			CRM_PERSON
+		<set>
+			<if test="CUSTOMER_NAME != null">
+				CUSTOMER_NAME = #{CUSTOMER_NAME},
+			</if>
+			<if test="CUSTOMER_AGE != null">
+				CUSTOMER_AGE = #{CUSTOMER_AGE},
+			</if>
+			<if test="CUSTOMER_JOB != null">
+				CUSTOMER_JOB = #{CUSTOMER_JOB},
+			</if>
+			<if test="CUSTOMER_GUBUN != null">
+				CUSTOMER_GUBUN = #{CUSTOMER_GUBUN},
+			</if>
+			<if test="REF_CUSTOMER_NO != null">
+				REF_CUSTOMER_NO = #{REF_CUSTOMER_NO},
+			</if>
+			<if test="IS_USED != null">
+				IS_USED = #{IS_USED},
+			</if>
+		</set>
+		WHERE
+			CUSTOMER_NO = #{CUSTOMER_NO}
+	</update>
+	
+	<update id="update_crm_02_02" parameterType="map" >
+		UPDATE
+			CRM_PERSON_ADDITION
+		<set>
+			<if test="CUSTOMER_PHONE != null">
+				CUSTOMER_PHONE = #{CUSTOMER_PHONE},
+			</if>
+			<if test="CUSTOMER_EMAIL != null">
+				CUSTOMER_EMAIL = #{CUSTOMER_EMAIL},
+			</if>
+			<if test="CUSTOMER_HOME_TEL != null">
+				CUSTOMER_HOME_TEL = #{CUSTOMER_HOME_TEL},
+			</if>
+			<if test="CUSTOMER_HOME_ADDR != null">
+				CUSTOMER_HOME_ADDR = #{CUSTOMER_HOME_ADDR},
+			</if>
+			<if test="COMPANY_NO != null">
+				COMPANY_NO = #{COMPANY_NO},
+			</if>
+			<if test="CUSTOMER_DEPT != null">
+				CUSTOMER_DEPT = #{CUSTOMER_DEPT},
+			</if>
+			<if test="CUSTOMER_TEAM != null">
+				CUSTOMER_TEAM = #{CUSTOMER_TEAM},
+			</if>
+			<if test="CUSTOMER_POSITION != null">
+				CUSTOMER_POSITION = #{CUSTOMER_POSITION},
+			</if>		
+			<if test="CUSTOMER_COMPANY_TEL != null">
+				CUSTOMER_COMPANY_TEL = #{CUSTOMER_COMPANY_TEL},
+			</if>	
+			<if test="ISNET_IMPRESSION != null">
+				ISNET_IMPRESSION = #{ISNET_IMPRESSION},
+			</if>
+			<if test="LAST_VISITED_DATE != null">
+				LAST_VISITED_DATE = #{LAST_VISITED_DATE},
+			</if>
+			<if test="FIRST_COMPANY_NAME != null">
+				FIRST_COMPANY_NAME = #{FIRST_COMPANY_NAME},
+			</if>
+			<if test="SECOND_COMPANY_NAME != null">
+				SECOND_COMPANY_NAME = #{SECOND_COMPANY_NAME},
+			</if>
+			<if test="THIRD_COMPANY_NAME != null">
+				THIRD_COMPANY_NAME = #{THIRD_COMPANY_NAME},
+			</if>
+			<if test="CUSTOMER_BLOOD != null">
+				CUSTOMER_BLOOD = #{CUSTOMER_BLOOD},
+			</if>
+			<if test="CUSTOMER_HEIGHT != null">
+				CUSTOMER_HEIGHT = #{CUSTOMER_HEIGHT},
+			</if>
+			<if test="CUSTOMER_WEIGHT != null">
+				CUSTOMER_WEIGHT = #{CUSTOMER_WEIGHT},
+			</if>
+			<if test="CUSTOMER_CAR != null">
+				CUSTOMER_CAR = #{CUSTOMER_CAR},
+			</if>
+			<if test="CUSTOMER_HOMETOWN != null">
+				CUSTOMER_HOMETOWN = #{CUSTOMER_HOMETOWN},
+			</if>
+			<if test="MARRIED_YN != null">
+				MARRIED_YN = #{MARRIED_YN},
+			</if>			
+			<if test="HOBBY != null">
+				HOBBY = #{HOBBY},
+			</if>
+			<if test="HOBBY_GRADE != null">
+				HOBBY_GRADE = #{HOBBY_GRADE},
+			</if>			
+			<if test="GRADUATE_SCHOOL_NAME != null">
+				GRADUATE_SCHOOL_NAME = #{GRADUATE_SCHOOL_NAME},
+			</if>
+			<if test="UNIVERSITY_NAME != null">
+				UNIVERSITY_NAME = #{UNIVERSITY_NAME},
+			</if>
+			<if test="HIGH_SCHOOL_NAME != null">
+				HIGH_SCHOOL_NAME = #{HIGH_SCHOOL_NAME},
+			</if>
+			<if test="MIDDLE_SCHOOL_NAME != null">
+				MIDDLE_SCHOOL_NAME = #{MIDDLE_SCHOOL_NAME},
+			</if>
+			<if test="PRIMARY_SCHOOL_NAME != null">
+				PRIMARY_SCHOOL_NAME = #{PRIMARY_SCHOOL_NAME},
+			</if>
+			<if test="MAJOR_NAME != null">
+				MAJOR_NAME = #{MAJOR_NAME},
+			</if>			
+			<if test="CUSTOMER_ETC != null">
+				CUSTOMER_ETC = #{CUSTOMER_ETC},
+			</if>		
+		</set>
+		WHERE
+			CUSTOMER_NO = #{CUSTOMER_NO}
+	</update>
+	
+	<update id="update_crm_03" parameterType="map" >
+		UPDATE
+			CRM_COMPANY
+		<set>
+			<if test="COMPANY_NAME != null">
+				COMPANY_NAME = #{COMPANY_NAME},
+			</if>
+			<if test="COMPANY_TEL != null">
+				COMPANY_TEL = #{COMPANY_TEL},
+			</if>
+			<if test="COMPANY_FAX != null">
+				COMPANY_FAX = #{COMPANY_FAX},
+			</if>
+			<if test="COMPANY_ADDR != null">
+				COMPANY_ADDR = #{COMPANY_ADDR},
+			</if>
+			<if test="IS_USED != null">
+				IS_USED = #{IS_USED},
+			</if>
+		</set>
+		WHERE
+			COMPANY_NO = #{COMPANY_NO}
+	</update>
+	
+</mapper>

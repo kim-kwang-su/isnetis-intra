@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.isnet.mgr.dao.ScheduleDao">
+	
+	<insert id="insert_schedule_01" parameterType="map" useGeneratedKeys="true" keyProperty="SCHEDULE_NO">
+		INSERT INTO
+			TB_SCHEDULE(SCHEDULE_NO, EMPLOYEE_NO, SCHEDULE_TITLE, SCHEDULE_MEMO, ALLDAY, START_SCHEDULE
+			<if test="END_SCHEDULE != null">
+				, END_SCHEDULE
+			</if>)
+		VALUES
+			(#{SCHEDULE_NO}, #{EMPLOYEE_NO}, #{SCHEDULE_TITLE}, #{SCHEDULE_MEMO}, #{ALLDAY}, #{START_SCHEDULE}
+			<if test="END_SCHEDULE != null">
+				, #{END_SCHEDULE}
+			</if>)
+	</insert>
+	
+	<select id="select_schedule_01" parameterType="map" resultType="hashmap">
+		SELECT 
+			A.SCHEDULE_NO, A.EMPLOYEE_NO, B.EMPLOYEE_NAME, A.SCHEDULE_TITLE, A.SCHEDULE_MEMO, A.ALLDAY, A.START_SCHEDULE, A.END_SCHEDULE 
+		FROM 
+			TB_SCHEDULE A, TB_EMPLOYEE B 
+		WHERE 
+			A.EMPLOYEE_NO = #{EMPLOYEE_NO}
+			AND A.EMPLOYEE_NO = B.EMPLOYEE_NO
+			AND A.START_SCHEDULE >= #{START,javaType=string} AND A.START_SCHEDULE &lt; #{END,javaType=string}
+		UNION 
+		SELECT 
+			A.SCHEDULE_NO, A.EMPLOYEE_NO, B.EMPLOYEE_NAME, A.SCHEDULE_TITLE, A.SCHEDULE_MEMO, A.ALLDAY, A.START_SCHEDULE, A.END_SCHEDULE 
+		FROM 
+			TB_SCHEDULE A, TB_EMPLOYEE B 
+		WHERE 
+			A.EMPLOYEE_NO =  #{EMPLOYEE_NO}
+			AND A.EMPLOYEE_NO = B.EMPLOYEE_NO
+			AND A.END_SCHEDULE >= #{START,javaType=string} AND A.END_SCHEDULE &lt; #{END,javaType=string}	
+	</select>
+	
+	<delete id="delete_schedule_01" parameterType="map">
+		DELETE FROM
+			TB_SCHEDULE
+		WHERE
+			SCHEDULE_NO = #{SCHEDULE_NO}
+			AND EMPLOYEE_NO = #{EMPLOYEE_NO}
+	</delete>
+	
+	<update id="update_schedule_01" parameterType="map">
+		UPDATE
+			TB_SCHEDULE
+		<set>
+			<if test="SCHEDULE_TITLE != null">
+				SCHEDULE_TITLE = #{SCHEDULE_TITLE},
+			</if>
+			<if test="SCHEDULE_MEMO != null">
+				SCHEDULE_MEMO = #{SCHEDULE_MEMO},
+			</if>
+			<if test="SCHEDULE_ALLDAY != null">
+				SCHEDULE_ALLDAY = #{SCHEDULE_ALLDAY},
+			</if>
+			<if test="START_SCHEDULE != null">
+				START_SCHEDULE = #{START_SCHEDULE},
+			</if>
+			<if test="END_SCHEDULE != null">
+				END_SCHEDULE = #{END_SCHEDULE},
+			</if>
+		</set>
+		WHERE
+			SCHEDULE_NO = #{SCHEDULE_NO}
+	</update>
+	
+</mapper>

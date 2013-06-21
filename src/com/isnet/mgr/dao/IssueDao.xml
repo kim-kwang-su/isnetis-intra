@@ -1,0 +1,599 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.isnet.mgr.dao.IssueDao">
+
+	<!-- TB_ISSUE 테이블의 상태정보를 조회합니다. AUTO_INCREMENT값을 조회하기 위한 용도로 사용 -->
+	<select id="select_issue_00" resultType="hashmap">
+		SHOW
+			TABLE STATUS
+		WHERE
+			NAME = 'TB_ISSUE'
+	</select>
+	
+	<!-- 조건을 만족하는 전체행의 갯수를 반환합니다. -->
+	<select id="select_issue_01" parameterType="map" resultType="int">
+		SELECT 
+			COUNT(*) TOTAL
+		FROM TB_ISSUE A
+		WHERE 
+			ACCEPT_DATE >= '2012-12-31'
+		<if test="rules != null">
+			<choose>
+				<when test="groupOp == 'AND'">
+					<foreach collection="rules" index="index" item="item" open="AND(" close=")" separator=" AND ">
+						<choose>
+							<when test="item.column == 'SE_NO' || item.column == 'DEVELOPER_NO'">
+								 A.ISSUE_NO IN (SELECT T.ISSUE_NO 
+												   FROM TB_DEVELOPER T 
+												   WHERE T.EMPLOYEE_NO = #{item.value}
+												   AND T.IS_USED = 'Y'
+												   <if test="item.column == 'SE_NO'">
+												   AND T.IS_SE = 'Y'
+												   </if>
+												   <if test="item.column == 'DEVELOPER_NO'">
+												   AND T.IS_SE = 'N'
+												   </if>
+												   )
+							</when>
+							<otherwise>
+								<choose>
+								<when test="item.op == 'cn'">
+									A.${item.column} LIKE CONCAT('%', #{item.value}, '%')
+								</when>
+								<when test="item.op == 'eq'">
+									A.${item.column} = #{item.value}
+								</when>
+								<when test="item.op == 'ne'">
+									A.${item.column} != #{item.value}
+								</when>
+							</choose>
+							</otherwise>
+						</choose>
+					</foreach>				
+				</when>
+				<when test="groupOp == 'OR'">
+					<foreach collection="rules" index="index" item="item" open="AND(" close=")" separator=" OR ">
+						<choose>
+							<when test="item.column == 'SE_NO' || item.column == 'DEVELOPER_NO'">
+								 A.ISSUE_NO IN (SELECT T.ISSUE_NO 
+												   FROM TB_DEVELOPER T 
+												   WHERE T.EMPLOYEE_NO = #{item.value}
+												   AND T.IS_USED = 'Y'
+												   <if test="item.column == 'SE_NO'">
+												   AND T.IS_SE = 'Y'
+												   </if>
+												   <if test="item.column == 'DEVELOPER_NO'">
+												   AND T.IS_SE = 'N'
+												   </if>
+												   )
+							</when>
+							<otherwise>
+								<choose>
+								<when test="item.op == 'cn'">
+									A.${item.column} LIKE CONCAT('%', #{item.value}, '%')
+								</when>
+								<when test="item.op == 'eq'">
+									A.${item.column} = #{item.value}
+								</when>
+								<when test="item.op == 'ne'">
+									A.${item.column} != #{item.value}
+								</when>
+							</choose>
+							</otherwise>
+						</choose>
+					</foreach>
+				</when>
+			</choose>
+		</if>
+	</select>
+	
+	<!-- 최근 접수된 이슈내역을 반환합니다. -->
+	<select id="select_issue_02" parameterType="map" resultType="hashmap">
+		SELECT 
+			A.ISSUE_NO, A.ACCEPT_DATE, A.CUSTOMER_REQUEST_DATE, B.CUSTOMER_NAME, C.PRODUCT_NAME, E.KIND_NAME, D.STATE_NAME, 
+			A.ISSUE_PRIORITY, A.EXPECTED_COMPLETE_DATE, A.RELEASE_DATE,
+			IF(LENGTH(A.ISSUE_MEMO) >= 40 ,CONCAT(SUBSTRING(A.ISSUE_MEMO,1,40),'...'), A.ISSUE_MEMO) ISSUE_MEMO,
+			(SELECT GROUP_CONCAT(Y.EMPLOYEE_NAME) FROM TB_DEVELOPER Z, TB_EMPLOYEE Y WHERE Z.ISSUE_NO = A.ISSUE_NO AND Z.IS_SE = 'N' AND Z.IS_USED = 'Y' AND Z.EMPLOYEE_NO = Y.EMPLOYEE_NO) DEVELOPER_NAME,
+			(SELECT GROUP_CONCAT(Y.EMPLOYEE_NAME) FROM TB_DEVELOPER Z, TB_EMPLOYEE Y WHERE Z.ISSUE_NO = A.ISSUE_NO AND Z.IS_SE = 'Y' AND Z.IS_USED = 'Y'  AND Z.EMPLOYEE_NO = Y.EMPLOYEE_NO) SE_NAME
+		FROM
+			TB_ISSUE A, TB_CUSTOMER B, TB_PRODUCT C, TB_ISSUE_STATE D, TB_ISSUE_KIND E
+		WHERE
+			ACCEPT_DATE >= '2012-12-31'
+		<if test="rules != null">
+			<choose>
+				<when test="groupOp == 'AND'">
+					<foreach collection="rules" index="index" item="item" open="AND(" close=")" separator=" AND ">
+						<choose>
+							<when test="item.column == 'SE_NO' || item.column == 'DEVELOPER_NO'">
+								 A.ISSUE_NO IN (SELECT T.ISSUE_NO 
+												   FROM TB_DEVELOPER T 
+												   WHERE T.EMPLOYEE_NO = #{item.value}
+												   AND T.IS_USED = 'Y'
+												   <if test="item.column == 'SE_NO'">
+												   AND T.IS_SE = 'Y'
+												   </if>
+												   <if test="item.column == 'DEVELOPER_NO'">
+												   AND T.IS_SE = 'N'
+												   </if>
+												   )
+							</when>
+							<otherwise>
+								<choose>
+								<when test="item.op == 'cn'">
+									A.${item.column} LIKE CONCAT('%', #{item.value}, '%')
+								</when>
+								<when test="item.op == 'eq'">
+									A.${item.column} = #{item.value}
+								</when>
+								<when test="item.op == 'ne'">
+									A.${item.column} != #{item.value}
+								</when>
+							</choose>
+							</otherwise>
+						</choose>
+					</foreach>				
+				</when>
+				<when test="groupOp == 'OR'">
+					<foreach collection="rules" index="index" item="item" open="AND(" close=")" separator=" OR ">
+						<choose>
+							<when test="item.column == 'SE_NO' || item.column == 'DEVELOPER_NO'">
+								 A.ISSUE_NO IN (SELECT T.ISSUE_NO 
+												   FROM TB_DEVELOPER T 
+												   WHERE T.EMPLOYEE_NO = #{item.value}
+												   AND T.IS_USED = 'Y'
+												   <if test="item.column == 'SE_NO'">
+												   AND T.IS_SE = 'Y'
+												   </if>
+												   <if test="item.column == 'DEVELOPER_NO'">
+												   AND T.IS_SE = 'N'
+												   </if>
+												   )
+							</when>
+							<otherwise>
+								<choose>
+								<when test="item.op == 'cn'">
+									A.${item.column} LIKE CONCAT('%', #{item.value}, '%')
+								</when>
+								<when test="item.op == 'eq'">
+									A.${item.column} = #{item.value}
+								</when>
+								<when test="item.op == 'ne'">
+									A.${item.column} != #{item.value}
+								</when>
+							</choose>
+							</otherwise>
+						</choose>
+					</foreach>
+				</when>
+			</choose>
+		</if>
+		AND A.CUSTOMER_NO = B.CUSTOMER_NO
+		AND A.PRODUCT_NO = C.PRODUCT_NO
+		AND A.STATE_NO = D.STATE_NO
+		AND A.KIND_NO = E.KIND_NO
+		<choose>
+			<when test="SIDX != ''">
+			ORDER BY 
+				A.${SIDX} ${SORD}
+			</when>
+			<otherwise>
+				ORDER BY A.ISSUE_NO DESC
+			</otherwise>
+		</choose>
+		LIMIT 
+			#{BEGIN_INDEX}, #{ROWS}	
+	</select>
+	
+	
+	<!-- 이슈의 상세정보를 반환합니다. -->
+	<select id="select_issue_03" parameterType="map" resultType="hashmap">
+		SELECT 
+			A.ISSUE_NO, A.ACCEPT_DATE, A.CUSTOMER_REQUEST_DATE, A.CUSTOMER_NO, E.CUSTOMER_NAME, A.EMPLOYEE_NO, B.EMPLOYEE_NAME, B.EMAIL, 
+			A.PRODUCT_NO, F.PRODUCT_NAME, A.KIND_NO, C.KIND_NAME, A.ISSUE_MEMO, A.ISSUE_PRIORITY, A.STATE_NO, D.STATE_NAME, A.EXPECTED_COMPLETE_DATE, 
+			A.EXPECTED_DEVELOPED_DATE, A.DEVELOPED_COMPLETE_DATE, A.DEVELOPED_PERIOD, A.ISSUE_REMARK, A.TEST_COMPLETE_DATE, A.RELEASE_DATE, A.CREATE_DATE 
+		FROM 
+			TB_ISSUE A, TB_EMPLOYEE B, TB_ISSUE_KIND C, TB_ISSUE_STATE D, TB_CUSTOMER E, TB_PRODUCT F
+		WHERE 
+			A.ISSUE_NO = #{ISSUE_NO}
+			AND A.EMPLOYEE_NO = B.EMPLOYEE_NO
+			AND A.KIND_NO = C.KIND_NO
+			AND A.STATE_NO = D.STATE_NO
+			AND A.CUSTOMER_NO = E.CUSTOMER_NO
+			AND A.PRODUCT_NO = F.PRODUCT_NO
+	</select>
+	
+	<!-- 해당 이슈의 개발 담당자를 반환합니다. -->
+	<select id="select_issue_04" parameterType="map" resultType="hashmap">
+		SELECT
+			A.EMPLOYEE_NO, B.EMPLOYEE_NAME, B.EMAIL, C.DEPT_NO, C.DEPT_NAME, A.IS_SE
+		FROM
+			TB_DEVELOPER A, TB_EMPLOYEE B, TB_DEPT C
+		WHERE
+			A.ISSUE_NO = #{ISSUE_NO}
+			AND A.IS_USED = 'Y'
+			<if test="IS_SE != null">
+			AND A.IS_SE = #{IS_SE}
+			</if>
+			AND A.EMPLOYEE_NO = B.EMPLOYEE_NO 
+			AND B.DEPT_NO = C.DEPT_NO
+		ORDER BY
+			A.EMPLOYEE_NO DESC
+	</select>
+	
+	<!-- 해당 이슈의 진행상황을 반환합니다. -->
+	<select id="select_issue_05" parameterType="map" resultType="hashmap">
+		SELECT 
+			A.ISSUE_HISTORY_NO, A.REGISTER_DATE, B.EMPLOYEE_NAME, A.PROCESS_MEMO, C.STATE_NAME
+		FROM
+			TB_ISSUE_HISTORY A, TB_EMPLOYEE B, TB_ISSUE_STATE C
+		WHERE
+			A.ISSUE_NO = #{ISSUE_NO}
+			AND A.EMPLOYEE_NO = B.EMPLOYEE_NO	
+			AND A.STATE_NO = C.STATE_NO
+		ORDER BY
+			A.ISSUE_HISTORY_NO DESC
+	</select>
+	
+	<!-- 진행상태 전체 코드 목록을 반환하빈다. -->
+	<select id="select_issue_06" parameterType="map" resultType="hashmap">
+		SELECT 
+			STATE_NO, STATE_NAME
+		FROM 
+			TB_ISSUE_STATE
+		ORDER BY 
+			STATE_NO ASC
+	</select>
+	
+	<!-- 이슈종류 전체 코드 목록을 반환하빈다. -->
+	<select id="select_issue_07" parameterType="map" resultType="hashmap">
+		SELECT 
+			KIND_NO, KIND_NAME
+		FROM 
+			TB_ISSUE_KIND
+		ORDER BY 
+			KIND_NO ASC
+	</select>
+	
+	<!-- 이슈의 첨부파일 정보를 반환합니다. -->
+	<select id="select_issue_08" parameterType="map" resultType="hashmap">
+		SELECT 
+			FILE_NO, FILE_NAME, ISSUE_NO, SUBSTRING(FILE_NAME, 15) FILE_NAME2
+		FROM 
+			TB_ISSUE_FILE
+		WHERE
+		<if test="ISSUE_NO != null">
+			ISSUE_NO = #{ISSUE_NO}
+		</if>
+		<if test="FILE_NO != null">
+			FILE_NO = #{FILE_NO}
+		</if>
+		ORDER BY 
+			FILE_NO ASC
+	</select>
+	
+	<select id="select_issue_09" parameterType="map" resultType="int">
+		SELECT 
+			COUNT(*)
+		FROM
+			TB_ISSUE A
+		WHERE
+			A.ACCEPT_DATE >= #{START_DATE} AND A.ACCEPT_DATE &lt;= #{END_DATE}
+			<choose>
+				<when test="EMPLOYEE_NO != null and EMPLOYEE_NO != 0">
+					AND ( A.ISSUE_NO IN (SELECT X.ISSUE_NO FROM TB_DEVELOPER X WHERE X.EMPLOYEE_NO = #{EMPLOYEE_NO}) )
+				</when>
+				<when test="CUSTOMER_NO != null and CUSTOMER_NO != 0">
+					AND A.CUSTOMER_NO = #{CUSTOMER_NO}
+				</when>
+			</choose>
+			AND A.STATE_NO &lt;= #{STATE_NO}
+	</select>
+	
+	<select id="select_issue_10" parameterType="map" resultType="hashmap">
+		SELECT 
+			A.ISSUE_NO, A.ACCEPT_DATE, B.STATE_NAME, C.CUSTOMER_NAME, IF(LENGTH(A.ISSUE_MEMO) >= 40 ,CONCAT(SUBSTRING(A.ISSUE_MEMO,1,40),'...'), A.ISSUE_MEMO) ISSUE_MEMO,
+			(SELECT GROUP_CONCAT(Y.EMPLOYEE_NAME) FROM TB_DEVELOPER Z, TB_EMPLOYEE Y WHERE Z.ISSUE_NO = A.ISSUE_NO AND Z.IS_SE = 'N' AND Z.IS_USED = 'Y' AND Z.EMPLOYEE_NO = Y.EMPLOYEE_NO) DEVELOPER_NAME,
+			(SELECT GROUP_CONCAT(Y.EMPLOYEE_NAME) FROM TB_DEVELOPER Z, TB_EMPLOYEE Y WHERE Z.ISSUE_NO = A.ISSUE_NO AND Z.IS_SE = 'Y' AND Z.IS_USED = 'Y'  AND Z.EMPLOYEE_NO = Y.EMPLOYEE_NO) SE_NAME
+		FROM 
+			TB_ISSUE A, TB_ISSUE_STATE B, TB_CUSTOMER C
+		WHERE 
+			A.ACCEPT_DATE >= #{START_DATE} AND A.ACCEPT_DATE &lt;= #{END_DATE}
+			<choose>
+				<when test="EMPLOYEE_NO != null and EMPLOYEE_NO != 0">
+					AND ( A.ISSUE_NO IN (SELECT X.ISSUE_NO FROM TB_DEVELOPER X WHERE X.EMPLOYEE_NO = #{EMPLOYEE_NO}) )
+				</when>
+				<when test="CUSTOMER_NO != null and CUSTOMER_NO != 0">
+					AND A.CUSTOMER_NO = #{CUSTOMER_NO}
+				</when>
+			</choose>
+			AND A.STATE_NO &lt;= #{STATE_NO}
+			AND A.STATE_NO = B.STATE_NO
+			AND A.CUSTOMER_NO = C.CUSTOMER_NO
+		ORDER BY
+			ISSUE_NO DESC
+		LIMIT 
+			#{BEGIN_INDEX}, #{ROWS}	
+	</select>	
+	
+	<select id="select_issue_11" parameterType="map" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			TB_QA_REQUEST
+		<if test="_SEARCH">
+		<where>
+			<choose>
+				<when test="SEARCH_OPER == 'cn'">
+					${SEARCH_FIELD} LIKE CONCAT('%', #{SEARCH_STRING}, '%')
+				</when>
+				<when test="SEARCH_OPER == 'eq'">
+					${SEARCH_FIELD} = #{SEARCH_STRING}
+				</when>
+				<when test="SEARCH_OPER == 'ne'">
+					${SEARCH_FIELD} != #{SEARCH_STRING}
+				</when>
+			</choose>
+		</where>
+		</if>
+	</select>
+	
+	<select id="select_issue_12" parameterType="map" resultType="hashmap">
+		SELECT
+			A.REQUEST_NO, A.ISSUE_NO, A.REQUEST_DATE, A.MODULE_NAME, B.EMPLOYEE_NAME, A.MODIFY_SUMMARY, A.TEST_DATE, A.TEST_RESULT, A.IS_REPORTED
+		FROM
+			TB_QA_REQUEST A, TB_EMPLOYEE B
+		WHERE
+			A.DEVELOPER_NO = B.EMPLOYEE_NO
+			<choose>
+				<when test="SEARCH_OPER == 'cn'">
+					AND ${SEARCH_FIELD} LIKE CONCAT('%', #{SEARCH_STRING}, '%')
+				</when>
+				<when test="SEARCH_OPER == 'eq'">
+					AND ${SEARCH_FIELD} = #{SEARCH_STRING}
+				</when>
+				<when test="SEARCH_OPER == 'ne'">
+					AND ${SEARCH_FIELD} != #{SEARCH_STRING}
+				</when>
+			</choose>
+		ORDER BY
+			A.REQUEST_NO DESC
+		LIMIT 
+			#{BEGIN_INDEX}, #{ROWS}	
+	</select>
+	
+	<select id="select_issue_13" parameterType="map" resultType="hashmap">
+		SELECT
+			A.REQUEST_NO, A.ISSUE_NO, A.DEVELOPER_NO, A.MODULE_NAME, A.MODULE_FILE_NAME, A.RESULT_FILE_NAME, A.MODIFY_SUMMARY, A.EFFECT_SUMMARY, A.REQUEST_DATE, A.TEST_SUMMARY, A.TEST_RESULT
+		FROM
+			TB_QA_REQUEST A
+		WHERE
+			A.REQUEST_NO = #{REQUEST_NO}
+	</select>
+	
+	<select id="select_issue_14" parameterType="map" resultType="hashmap">
+		SELECT
+			A.REQUEST_NO, B.MODULE_NAME, A.TEST_COUNT, A.BUG_SUMMARY, A.BUG_FREQUENCY, A.BUG_IMPORTANCE, A.QA_DATE, C.EMPLOYEE_NAME, A.NOTICE_DATE, A.RESOLVE_YN, A.FILE_NAME
+		FROM
+			TB_QA_BUG_REPORT A, TB_QA_REQUEST B, TB_EMPLOYEE C
+		WHERE
+			A.REQUEST_NO = #{REQUEST_NO}
+			AND A.REQUEST_NO = B.REQUEST_NO
+			AND B.DEVELOPER_NO = C.EMPLOYEE_NO
+	</select>
+	
+	<!-- 이슈 정보를 저장합니다. -->
+	<insert id="insert_issue_00" parameterType="map">
+		INSERT INTO
+			TB_ISSUE(ISSUE_NO, ACCEPT_DATE, CUSTOMER_NO, EMPLOYEE_NO, PRODUCT_NO, KIND_NO, ISSUE_MEMO, ISSUE_PRIORITY, STATE_NO, CREATE_DATE
+			<if test="CUSTOMER_REQUEST_DATE != null">
+			, CUSTOMER_REQUEST_DATE			
+			</if>
+			<if test="EXPECTED_COMPLETE_DATE != null">
+			, EXPECTED_COMPLETE_DATE			
+			</if>
+			<if test="EXPECTED_DEVELOPED_DATE != null">
+			, EXPECTED_DEVELOPED_DATE			
+			</if>
+			<if test="DEVELOPED_COMPLETE_DATE != null">
+			, DEVELOPED_COMPLETE_DATE			
+			</if>
+			<if test="DEVELOPED_PERIOD != null">
+			, DEVELOPED_PERIOD			
+			</if>
+			<if test="ISSUE_REMARK != null">
+			, ISSUE_REMARK
+			</if>
+			)
+		VALUES
+			(#{ISSUE_NO}, #{ACCEPT_DATE}, #{CUSTOMER_NO}, #{EMPLOYEE_NO}, #{PRODUCT_NO}, #{KIND_NO}, #{ISSUE_MEMO}, #{ISSUE_PRIORITY}, #{STATE_NO}, #{CREATE_DATE}
+			<if test="CUSTOMER_REQUEST_DATE != null">
+			, #{CUSTOMER_REQUEST_DATE}			
+			</if>
+			<if test="EXPECTED_COMPLETE_DATE != null">
+			, #{EXPECTED_COMPLETE_DATE}			
+			</if>
+			<if test="EXPECTED_DEVELOPED_DATE != null">
+			, #{EXPECTED_DEVELOPED_DATE}			
+			</if>
+			<if test="DEVELOPED_COMPLETE_DATE != null">
+			, #{DEVELOPED_COMPLETE_DATE}			
+			</if>
+			<if test="DEVELOPED_PERIOD != null">
+			, #{DEVELOPED_PERIOD}			
+			</if>
+			<if test="ISSUE_REMARK != null">
+			, #{ISSUE_REMARK}
+			</if>
+			)
+	</insert>
+	
+	<!-- 이슈 담당 개발자 정보를 저장합니다. -->
+	<insert id="insert_issue_01" parameterType="map">
+		INSERT INTO TB_DEVELOPER
+			(ISSUE_NO, EMPLOYEE_NO, IS_USED, IS_SE)
+		VALUES
+			(#{ISSUE_NO}, #{EMPLOYEE_NO}, 'Y', #{IS_SE})
+		ON DUPLICATE KEY
+		UPDATE IS_USED = 'Y'
+		<!-- INSERT
+			TB_DEVELOPER(ISSUE_NO, EMPLOYEE_NO, IS_USED)
+		VALUES
+			(#{ISSUE_NO}, #{EMPLOYEE_NO}, 'Y') -->
+	</insert>
+	
+	<!-- 이슈 진행 상황을 저장합니다. -->
+	<insert id="insert_issue_02" parameterType="map">
+		INSERT INTO 
+			TB_ISSUE_HISTORY(PROCESS_MEMO, REGISTER_DATE, EMPLOYEE_NO, ISSUE_NO, STATE_NO)
+		VALUES
+			(#{PROCESS_MEMO}, #{REGISTER_DATE}, #{EMPLOYEE_NO}, #{ISSUE_NO}, #{STATE_NO})	
+	</insert>
+	
+	<!-- 첨부파일을 등록합니다. -->
+	<insert id="insert_issue_03" parameterType="map">
+		INSERT 
+			TB_ISSUE_FILE(FILE_NAME, ISSUE_NO)
+		VALUES
+			(#{FILE_NAME}, #{ISSUE_NO})
+	</insert>
+
+	<!-- QA 테스트요청을 등록합니다.  -->
+	<insert id="insert_issue_04" parameterType="map">
+		INSERT INTO
+			TB_QA_REQUEST(ISSUE_NO, DEVELOPER_NO, MODULE_NAME, MODULE_FILE_NAME, MODIFY_SUMMARY, EFFECT_SUMMARY, REQUEST_DATE)
+		VALUES
+			(#{ISSUE_NO}, #{DEVELOPER_NO}, #{MODULE_NAME}, #{MODULE_FILE_NAME}, #{MODIFY_SUMMARY}, #{EFFECT_SUMMARY}, #{REQUEST_DATE})
+	</insert>
+	
+	<insert id="insert_issue_05" parameterType="map">
+		INSERT INTO
+			TB_QA_BUG_REPORT(REQUEST_NO, TEST_COUNT, BUG_SUMMARY, BUG_FREQUENCY, BUG_IMPORTANCE, QA_DATE, NOTICE_DATE, RESOLVE_YN, TESTER_NO, FILE_NAME)
+		VALUES
+			(#{REQUEST_NO}, #{TEST_COUNT}, #{BUG_SUMMARY}, #{BUG_FREQUENCY}, #{BUG_IMPORTANCE}, #{QA_DATE}, #{NOTICE_DATE}, #{RESOLVE_YN}, #{TESTER_NO}, #{FILE_NAME})
+		ON DUPLICATE KEY
+		UPDATE 
+			TEST_COUNT = #{TEST_COUNT}, 
+			BUG_SUMMARY = #{BUG_SUMMARY}, 
+			BUG_FREQUENCY = #{BUG_FREQUENCY}, 
+			BUG_IMPORTANCE = #{BUG_IMPORTANCE}, 
+			QA_DATE = #{QA_DATE}, 
+			NOTICE_DATE = #{NOTICE_DATE}, 
+			RESOLVE_YN = #{RESOLVE_YN}, 
+			TESTER_NO = #{TESTER_NO}, 
+			FILE_NAME = #{FILE_NAME}
+	</insert>
+	
+	<!-- 이슈 담당 개발자 정보를 삭제합니다. -->	
+	<update id="delete_issue_01" parameterType="int">
+		UPDATE 
+			TB_DEVELOPER
+		SET 
+			IS_USED = 'N'
+		WHERE
+			ISSUE_NO = #{ISSUE_NO}
+			AND IS_SE = #{IS_SE}
+		<!--
+		DELETE FROM
+			TB_DEVELOPER
+		WHERE 
+			ISSUE_NO = #{ISSUE_NO}
+			AND EMPLOYEE_NO IN (SELECT EMPLOYEE_NO FROM TB_EMPLOYEE WHERE DEPT_NO = 2) ;
+		-->
+	</update>
+	
+	<!-- 이슈의 정보를 변경합니다. -->
+	<update id="update_issue_01" parameterType="map">
+		UPDATE 
+			TB_ISSUE
+		<set>
+			<if test="ACCEPT_DATE != null">
+				ACCEPT_DATE = #{ACCEPT_DATE},
+			</if>
+			<if test="STATE_NO != null">
+				STATE_NO = #{STATE_NO},
+			</if>
+			<if test="CUSTOMER_REQUEST_DATE != null">
+				CUSTOMER_REQUEST_DATE = #{CUSTOMER_REQUEST_DATE},
+			</if>
+			<if test="EXPECTED_COMPLETE_DATE != null">
+				EXPECTED_COMPLETE_DATE = #{EXPECTED_COMPLETE_DATE},
+			</if>
+			<if test="EXPECTED_DEVELOPED_DATE != null">
+				EXPECTED_DEVELOPED_DATE = #{EXPECTED_DEVELOPED_DATE},
+			</if>
+			<if test="DEVELOPED_COMPLETE_DATE != null">
+				DEVELOPED_COMPLETE_DATE = #{DEVELOPED_COMPLETE_DATE},
+			</if>
+			<if test="DEVELOPED_PERIOD != null">
+				DEVELOPED_PERIOD = #{DEVELOPED_PERIOD},
+			</if>
+			<if test="TEST_COMPLETE_DATE != null">
+				TEST_COMPLETE_DATE = #{TEST_COMPLETE_DATE},
+			</if>
+			<if test="RELEASE_DATE != null">
+				RELEASE_DATE = #{RELEASE_DATE},
+			</if>
+			<if test="CUSTOMER_NO != null">
+				CUSTOMER_NO = #{CUSTOMER_NO},
+			</if>
+			<if test="PRODUCT_NO != null">
+				PRODUCT_NO = #{PRODUCT_NO},
+			</if>
+			<if test="KIND_NO != null">
+				KIND_NO = #{KIND_NO},
+			</if>
+			<if test="ISSUE_PRIORITY != null">
+				ISSUE_PRIORITY = #{ISSUE_PRIORITY},
+			</if>
+			<if test="ISSUE_MEMO != null">
+				ISSUE_MEMO = #{ISSUE_MEMO},
+			</if>
+			<if test="ISSUE_REMARK != null">
+				ISSUE_REMARK = #{ISSUE_REMARK},
+			</if>
+		</set>
+		WHERE
+			ISSUE_NO = #{ISSUE_NO}		
+	</update>
+
+	<update id="update_issue_02" parameterType="map">
+		UPDATE 
+			TB_QA_REQUEST
+		<set>
+			<if test="MODULE_NAME != null">
+				MODULE_NAME = #{MODULE_NAME},
+			</if>
+			<if test="MODULE_FILE_NAME != null">
+				MODULE_FILE_NAME = #{MODULE_FILE_NAME},
+			</if>
+			<if test="RESULT_FILE_NAME != null">
+				RESULT_FILE_NAME = #{RESULT_FILE_NAME},
+			</if>
+			<if test="MODULE_LOCATION != null">
+				MODULE_LOCATION = #{MODULE_LOCATION},
+			</if>
+			<if test="MODIFY_SUMMARY != null">
+				MODIFY_SUMMARY = #{MODIFY_SUMMARY},
+			</if>
+			<if test="TEST_SUMMARY != null">
+				TEST_SUMMARY = #{TEST_SUMMARY},
+			</if>
+			<if test="TEST_RESULT != null">
+				TEST_RESULT = #{TEST_RESULT},
+			</if>
+			<if test="TEST_DATE != null">
+				TEST_DATE = #{TEST_DATE},
+			</if>
+			<if test="IS_REPORTED != null">
+				IS_REPORTED = #{IS_REPORTED},
+			</if>
+			<if test="TESTER_NO != null">
+				TESTER_NO = #{TESTER_NO}
+			</if>
+		</set>			
+		WHERE
+			REQUEST_NO = #{REQUEST_NO}
+	</update>
+	
+</mapper>

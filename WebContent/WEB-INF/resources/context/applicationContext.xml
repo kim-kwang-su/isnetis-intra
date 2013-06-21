@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+	<util:properties id="config" location="/WEB-INF/resources/properties/config.properties"/>
+	
+	<context:property-placeholder location="/WEB-INF/resources/properties/mail.properties"/>
+
+	<!-- dataSource 설정 -->
+	<jee:jndi-lookup id="dataSource" jndi-name="jdbc/mysql"/>
+	
+	<!-- MyBatis 설정 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+  		<property name="dataSource" ref="dataSource" />
+	</bean>
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+  		<property name="basePackage" value="com.isnet.mgr.dao" />
+	</bean>
+	
+	<!-- Service Bean 등록 -->
+	<context:component-scan base-package="com.isnet.mgr.service"/>
+	
+	<!-- CommonCodeBean 등록 -->
+	<bean class="com.isnet.mgr.common.CommonCodeBean" init-method="init"/>
+	
+	<!-- 트랜잭션 설정 -->	
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+	<tx:annotation-driven/>
+	
+	<!-- mail 설정 -->
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="${mail.host}"/>
+		<property name="username" value="${mail.username}"/>
+		<property name="password" value="${mail.password}"/>
+		<property name="javaMailProperties">
+   			<props>
+			    <prop key="mail.smtp.auth">true</prop>
+			    <prop key="mail.smtp.debug">true</prop>
+			    <!-- <prop key="mail.smtp.starttls.enable">true</prop>
+			    <prop key="mail.smtp.EnableSSL.enable">true</prop> -->
+			    <prop key="mail.mime.charset">UTF-8</prop>
+   			</props>
+  		</property>
+	</bean>
+	
+	
+	
+</beans>

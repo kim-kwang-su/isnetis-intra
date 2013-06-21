@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.isnet.mgr.dao.CustomerDao">
+	<select id="select_customer_01" resultType="hashmap">
+		SELECT
+			CUSTOMER_NO , CUSTOMER_NAME
+		FROM
+			TB_CUSTOMER
+		WHERE IS_USED = 'Y'
+		ORDER BY
+			CUSTOMER_NAME
+	</select>
+	
+	<select id="select_customer_02" parameterType="map" resultType="int">
+		SELECT
+			    count(*) 
+		FROM
+			TB_CUSTOMER
+			WHERE 1=1
+			<if test="_SEARCH == true">
+				<choose>
+					<when test="SEARCH_OPER == 'cn'">
+						AND ${SEARCH_FIELD} LIKE CONCAT('%', #{SEARCH_STRING}, '%')
+					</when>
+					<when test="SEARCH_OPER == 'eq'">
+						AND ${SEARCH_FIELD} = #{SEARCH_STRING}
+					</when>
+				</choose>
+			</if>
+	</select>
+	
+		<select id="select_customer_03" parameterType="map" resultType="hashmap">
+		SELECT
+			   CUSTOMER_NO, CUSTOMER_NAME, CUSTOMER_ADDRESS, CUSTOMER_TEL, CASE WHEN IS_USED = 'y' THEN '사용' ELSE '미사용' END IS_USED
+		FROM
+			TB_CUSTOMER
+			WHERE 1=1
+			<if test="_SEARCH == true">
+				<choose>
+					<when test="SEARCH_OPER == 'cn'">
+						AND ${SEARCH_FIELD} LIKE CONCAT('%', #{SEARCH_STRING}, '%')
+					</when>
+					<when test="SEARCH_OPER == 'eq'">
+						AND ${SEARCH_FIELD} = #{SEARCH_STRING}
+					</when>
+				</choose>
+			</if>
+			<choose>
+				<when test="SIDX != '' ">
+				ORDER BY 
+					${SIDX} ${SORD}
+				</when>
+				<otherwise>
+					ORDER BY CUSTOMER_NAME
+				</otherwise>
+			</choose>
+			LIMIT 
+			#{BEGIN_INDEX}, #{ROWS}
+	</select>
+	
+	<select id="select_customer_04" parameterType="map" resultType="hashmap">
+		SELECT * FROM TB_CUSTOMER
+		WHERE CUSTOMER_NAME = #{CUSTOMER_NAME}
+	</select>
+	
+	<insert id="insert_customer_01" parameterType="map">
+		INSERT INTO TB_CUSTOMER 
+		(CUSTOMER_NAME, CUSTOMER_ADDRESS, CUSTOMER_TEL, IS_USED) 
+		VALUES (
+		#{CUSTOMER_NAME},#{CUSTOMER_ADDRESS},#{CUSTOMER_TEL},#{IS_USED}
+		)
+	</insert>
+	
+	<update id="update_customer_01" parameterType="map">
+		UPDATE TB_CUSTOMER SET 
+				<if test="CUSTOMER_NAME != null  and CUSTOMER_NAME!=''" >
+				CUSTOMER_NAME =  #{CUSTOMER_NAME},
+				</if>
+				<if test="CUSTOMER_ADDRESS != null  and CUSTOMER_ADDRESS != ''" >
+				CUSTOMER_ADDRESS =  #{CUSTOMER_ADDRESS},
+				</if>
+				<if test="CUSTOMER_TEL != null  and CUSTOMER_TEL != ''" >
+				CUSTOMER_TEL=  #{CUSTOMER_TEL}, 
+				</if>
+				IS_USED =  #{IS_USED}
+			WHERE CUSTOMER_NO = #{CUSTOMER_NO}
+	</update>
+
+
+	<select id="select_customer_05" parameterType="string" resultType="hashmap">
+		SELECT CUSTOMER_NO, CUSTOMER_NAME
+		 FROM TB_CUSTOMER
+		 WHERE CUSTOMER_NAME LIKE CONCAT('%',#{VALUE}, '%')
+		  AND IS_USED= 'Y'
+	</select>
+	
+	<select id="select_customer_06" resultType="hashmap">
+		SELECT CUSTOMER_NO, CUSTOMER_NAME,
+		CASE WHEN CUSTOMER_NAME !='기타'AND CUSTOMER_NAME !='공통' AND CUSTOMER_NAME >= '가' AND CUSTOMER_NAME &lt; '나' THEN '가' 
+		     WHEN CUSTOMER_NAME >= '나' AND CUSTOMER_NAME &lt; '다' THEN '나' 
+		     WHEN CUSTOMER_NAME >= '다' AND CUSTOMER_NAME &lt; '라' THEN '다' 
+		     WHEN CUSTOMER_NAME >= '라' AND CUSTOMER_NAME &lt; '마' THEN '라' 
+		     WHEN CUSTOMER_NAME >= '마' AND CUSTOMER_NAME &lt; '바' THEN '마' 
+		     WHEN CUSTOMER_NAME >= '바' AND CUSTOMER_NAME &lt; '사' THEN '바' 
+		     WHEN CUSTOMER_NAME >= '사' AND CUSTOMER_NAME &lt; '아' THEN '사' 
+		     WHEN CUSTOMER_NAME >= '아' AND CUSTOMER_NAME &lt; '자' THEN '아' 
+		     WHEN CUSTOMER_NAME >= '자' AND CUSTOMER_NAME &lt; '차' THEN '자' 
+		     WHEN CUSTOMER_NAME >= '차' AND CUSTOMER_NAME &lt; '카' THEN '차' 
+		     WHEN CUSTOMER_NAME >= '카' AND CUSTOMER_NAME &lt; '타' THEN '카' 
+		     WHEN CUSTOMER_NAME >= '타' AND CUSTOMER_NAME &lt; '파' THEN '타' 
+		     WHEN CUSTOMER_NAME >= '파' AND CUSTOMER_NAME &lt; '하' THEN '파' 
+		     WHEN CUSTOMER_NAME >= '하' AND CUSTOMER_NAME &lt; '힣' THEN '하' 
+		     ELSE '기타' END TITLE
+		 FROM TB_CUSTOMER
+		 WHERE IS_USED ='Y'
+		 ORDER BY 3, 2
+	</select>
+</mapper>

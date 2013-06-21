@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.isnet.mgr.dao.OptionDao">
+	
+	<select id="select_option_file_01" parameterType="map" resultType="hashmap">
+		SELECT OPTION_FILE_NO, OPTION_FILE_NAME
+			FROM TB_OPTION_FILE
+		<if test="PRODUCT_NO !=null and PRODUCT_NO!= ''">	
+			WHERE PRODUCT_NO =  #{PRODUCT_NO}
+		</if>
+		GROUP BY OPTION_FILE_NO , OPTION_FILE_NAME
+		ORDER BY OPTION_FILE_NO
+	</select>
+	
+	<!-- <select id="select_option_file_02" parameterType="map" resultType="hashmap">
+		SELECT  T1.OPTION_FILE_NO, T1.OPTION_FILE_NAME
+			,      T1.OPTION_APP_NO, T1.OPTION_APP_NAME, T1.OPTION_APP_ORDER
+			,      T1.OPTION_NO, T1.OPTION_KEY_NAME, T1.OPTION_DEFAULT_VALUE
+	        ,      T1.OPTION_COMMENT
+	        ,      T2.COMMENT
+			FROM
+			(
+			SELECT T1.OPTION_FILE_NO, T1.OPTION_FILE_NAME
+			,      T2.OPTION_APP_NO, T2.OPTION_APP_NAME, T2.OPTION_APP_ORDER
+			,      T3.OPTION_NO, T3.OPTION_KEY_NAME, T3.OPTION_DEFAULT_VALUE, T3.OPTION_COMMENT
+			  FROM (SELECT OPTION_FILE_NO, OPTION_FILE_NAME
+	              FROM TB_OPTION_FILE 
+	              GROUP BY OPTION_FILE_NO, OPTION_FILE_NAME) T1
+	      , TB_OPTION_APP T2,TB_OPTIONS T3
+			WHERE T1.OPTION_FILE_NO = T2.OPTION_FILE_NO
+			  AND T2.OPTION_APP_NO = T3.OPTION_APP_NO
+			  ) T1 
+			  LEFT JOIN ( 
+	                  	  SELECT GROUP_CONCAT(CONCAT('- ',COMMENT_VALUE,':', COMMENT_MEMO) ORDER BY COMMENT_VALUE )COMMENT
+                          ,      OPTION_NO
+	                        FROM TB_COMMENTS
+                          GROUP BY OPTION_NO
+	      ) T2 ON T1.OPTION_NO = T2.OPTION_NO
+	  ORDER BY T1.OPTION_FILE_NO, T1.OPTION_APP_NO, T1.OPTION_NO
+	</select> -->
+	
+	<select id="select_option_file_03" parameterType="map" resultType="hashmap">
+		SELECT 
+			A.PRODUCT_NO, D.OPTION_FILE_NO, C.OPTION_APP_NO, D.OPTION_FILE_NAME, C.OPTION_APP_NAME, C.OPTION_APP_ORDER, B.OPTION_NO, B.OPTION_KEY_NAME, B.OPTION_DEFAULT_VALUE, A.OPTION_VALUE, B.OPTION_COMMENT
+		FROM 
+			TB_CUSTOMER_APPLY_OPTIONS A, TB_OPTIONS B, TB_OPTION_APP C, TB_OPTION_FILE D
+		WHERE
+			A.CUSTOMER_NO = #{CUSTOMER_NO} AND A.PRODUCT_NO = #{PRODUCT_NO}
+			AND A.OPTION_NO = B.OPTION_NO
+			AND B.OPTION_APP_NO = C.OPTION_APP_NO
+			AND C.OPTION_FILE_NO = D.OPTION_FILE_NO
+		ORDER BY
+			D.OPTION_FILE_NO, C.OPTION_APP_NO
+		
+	</select>
+	
+	<update id="delete_option_01" parameterType="map">
+		DELETE FROM TB_CUSTOMER_APPLY_OPTIONS
+		WHERE CUSTOMER_NO =  #{CUSTOMER_NO}
+		  AND PRODUCT_NO = #{PRODUCT_NO}
+	</update>
+	
+	
+	<insert id="insert_option_01" parameterType="map">
+		INSERT INTO TB_CUSTOMER_APPLY_OPTIONS
+		SELECT  #{CUSTOMER_NO} ,  #{VALUE1}, #{VALUE2}, #{PRODUCT_NO}
+	</insert>
+	
+	<select id="select_option_01" resultType="hashmap">
+		SELECT 
+	 		GROUP_CONCAT(CONCAT('- ',COMMENT_VALUE,':', COMMENT_MEMO) ORDER BY COMMENT_VALUE )COMMENT, OPTION_NO
+	 	FROM 
+	 		TB_COMMENTS
+		GROUP BY 
+			OPTION_NO
+	</select>
+	
+	<select id="select_option_02" parameterType="map" resultType="hashmap">
+		SELECT
+			D.PRODUCT_NO, D.PRODUCT_NAME, C.OPTION_FILE_NO, C.OPTION_FILE_NAME, B.OPTION_APP_NO, B.OPTION_APP_NAME, A.OPTION_NO, A.OPTION_KEY_NAME, A.OPTION_DEFAULT_VALUE, A.OPTION_COMMENT
+		FROM
+			TB_OPTIONS A, TB_OPTION_APP B, TB_OPTION_FILE C, TB_PRODUCT D
+		WHERE
+			1=1
+			<if test="_SEARCH == true">
+			<choose>
+				<when test="SEARCH_OPER == 'cn'">
+					AND ${SEARCH_FIELD} LIKE CONCAT('%', #{SEARCH_STRING}, '%')
+				</when>
+				<when test="SEARCH_OPER == 'eq'">
+					AND ${SEARCH_FIELD} = #{SEARCH_STRING}
+				</when>
+			</choose>
+			</if>
+			AND A.OPTION_APP_NO = B.OPTION_APP_NO
+			AND B.OPTION_FILE_NO = C.OPTION_FILE_NO
+			AND C.PRODUCT_NO = D.PRODUCT_NO
+		ORDER BY 
+			D.PRODUCT_NO, C.OPTION_FILE_NO, B.OPTION_APP_NO, A.OPTION_NO
+		LIMIT 
+			#{BEGIN_INDEX}, #{ROWS}
+	</select>
+
+	<select id="select_option_03" parameterType="map" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			TB_OPTIONS A, TB_OPTION_APP B, TB_OPTION_FILE C, TB_PRODUCT D
+		WHERE
+			1=1
+			<if test="_SEARCH == true">
+			<choose>
+				<when test="SEARCH_OPER == 'cn'">
+					AND ${SEARCH_FIELD} LIKE CONCAT('%', #{SEARCH_STRING}, '%')
+				</when>
+				<when test="SEARCH_OPER == 'eq'">
+					AND ${SEARCH_FIELD} = #{SEARCH_STRING}
+				</when>
+			</choose>
+			</if>
+			AND A.OPTION_APP_NO = B.OPTION_APP_NO
+			AND B.OPTION_FILE_NO = C.OPTION_FILE_NO
+			AND C.PRODUCT_NO = D.PRODUCT_NO
+	</select>	
+	
+	<select id="select_option_03_01" parameterType="map" resultType="hashmap">
+		SELECT OPTION_FILE_NO, OPTION_FILE_NAME
+	 	  FROM TB_OPTION_FILE
+	 	 WHERE PRODUCT_NO = #{PRODUCT_NO}
+	 	   <if test="OPTION_FILE_NO != null">
+	 	   AND OPTION_FILE_NO = #{OPTION_FILE_NO}
+	 	   </if>
+	     ORDER BY OPTION_FILE_NAME
+	</select>
+	
+	<select id="select_option_03_02" parameterType="map" resultType="hashmap">
+		SELECT OPTION_APP_NO, OPTION_APP_NAME, OPTION_FILE_NO
+		 FROM TB_OPTION_APP
+		WHERE OPTION_FILE_NO = #{OPTION_FILE_NO}
+		<if test="OPTION_APP_NO != null">
+		  AND OPTION_APP_NO = #{OPTION_APP_NO} 
+		</if>
+		ORDER BY OPTION_APP_ORDER
+	</select>
+	<select id="select_option_03_03" parameterType="map" resultType="hashmap">
+		SELECT OPTION_NO, OPTION_KEY_NAME, OPTION_DEFAULT_VALUE, OPTION_COMMENT
+		FROM TB_OPTIONS
+		WHERE OPTION_APP_NO = #{OPTION_APP_NO} 
+		<if test="OPTION_NO != null">		
+		  AND OPTION_NO = #{OPTION_NO}
+		</if>
+		ORDER BY OPTION_NO
+	</select>	
+	<select id="select_option_03_04" parameterType="map" resultType="hashmap">
+		SELECT COMMENT_NO, COMMENT_VALUE, COMMENT_MEMO
+		 FROM TB_COMMENTS
+		WHERE OPTION_NO = #{OPTION_NO}
+		ORDER BY COMMENT_NO
+	</select>
+	      
+	<select id="select_option_03_05" resultType="hashmap">
+		SELECT OPTION_FILE_NO, OPTION_FILE_NAME
+	 	  FROM TB_OPTION_FILE
+	 	 WHERE PRODUCT_NO = (SELECT MIN(PRODUCT_NO) FROM TB_OPTION_FILE ORDER BY OPTION_FILE_NAME)
+	     ORDER BY OPTION_FILE_NAME
+	</select>
+	
+	<select id="select_option_05_01" parameterType="map" resultType="hashmap">
+  		  SELECT T1.OPTION_FILE_NAME, T1.OPTION_FILE_NO 
+	      ,      T2.OPTION_APP_NO 
+          ,      IFNULL(T2.OPTION_APP_NAME,'')OPTION_APP_NAME  
+		  ,      T3.OPTION_NO
+          ,      IFNULL(T3.OPTION_KEY_NAME,'') OPTION_KEY_NAME
+          ,      IFNULL(T3.OPTION_DEFAULT_VALUE,'') OPTION_DEFAULT_VALUE
+		  ,      CASE WHEN IFNULL(T4.COMMENT,'')='' THEN T3.OPTION_COMMENT 
+		              ELSE CONCAT(T3.OPTION_COMMENT ,' (' ,T4.COMMENT, ')') END OPTION_COMMENT
+		<if test='CUSTOMER_NO1 != null and CUSTOMER_NO1 != ""'>    
+		,      IFNULL(T5.OPTION_VALUE, IFNULL(T3.OPTION_DEFAULT_VALUE,'')) OPTION_VALUE1
+		</if>
+		<if test='CUSTOMER_NO2 != null and CUSTOMER_NO2 != ""'>    
+		,      IFNULL(T6.OPTION_VALUE, IFNULL(T3.OPTION_DEFAULT_VALUE,'')) OPTION_VALUE2
+		</if>
+		<if test='CUSTOMER_NO3 != null and CUSTOMER_NO3 != ""'>    	
+		,      IFNULL(T7.OPTION_VALUE, IFNULL(T3.OPTION_DEFAULT_VALUE,'')) OPTION_VALUE3
+		</if>
+		<if test='CUSTOMER_NO4 != null and CUSTOMER_NO4 != ""'>    	
+		,      IFNULL(T8.OPTION_VALUE, IFNULL(T3.OPTION_DEFAULT_VALUE,'')) OPTION_VALUE4     
+		</if>
+		FROM
+		(
+		SELECT OPTION_FILE_NAME, OPTION_FILE_NO  
+		  FROM TB_OPTION_FILE
+		 WHERE PRODUCT_NO = #{PRODUCT_NO}
+		 ${OPTION_FILE_QUERY}
+		) T1 
+		JOIN TB_OPTION_APP T2 ON T1.OPTION_FILE_NO = T2.OPTION_FILE_NO
+		LEFT JOIN TB_OPTIONS T3 ON T2.OPTION_APP_NO = T3.OPTION_APP_NO
+		LEFT JOIN (  SELECT OPTION_NO, GROUP_CONCAT(COMMENT) COMMENT
+		            FROM
+		              (
+		                SELECT OPTION_NO, CONCAT(COMMENT_VALUE,':', COMMENT_MEMO, ' ') COMMENT
+		                FROM TB_COMMENTS
+		                ORDER BY COMMENT_NO
+		              ) T4
+		             GROUP BY OPTION_NO ) T4 ON T3.OPTION_NO = T4.OPTION_NO
+		<if test='CUSTOMER_NO1 != null and CUSTOMER_NO1 != ""'>         
+		LEFT JOIN TB_CUSTOMER_APPLY_OPTIONS T5 ON T5.CUSTOMER_NO = #{CUSTOMER_NO1} AND T3.OPTION_NO = T5.OPTION_NO
+		</if>
+		<if test='CUSTOMER_NO2 != null and CUSTOMER_NO2 != ""'>  
+		LEFT JOIN TB_CUSTOMER_APPLY_OPTIONS T6 ON T6.CUSTOMER_NO = #{CUSTOMER_NO2} AND T3.OPTION_NO = T6.OPTION_NO
+		</if>	
+		<if test='CUSTOMER_NO3 != null and CUSTOMER_NO3 != ""'>  
+		LEFT JOIN TB_CUSTOMER_APPLY_OPTIONS T7 ON T7.CUSTOMER_NO = #{CUSTOMER_NO3} AND T3.OPTION_NO = T7.OPTION_NO
+		</if>
+		<if test='CUSTOMER_NO4 != null and CUSTOMER_NO4 != ""'>  
+		LEFT JOIN TB_CUSTOMER_APPLY_OPTIONS T8 ON T8.CUSTOMER_NO = #{CUSTOMER_NO4} AND T3.OPTION_NO = T8.OPTION_NO
+		</if>
+		ORDER BY T1.OPTION_FILE_NAME, T2.OPTION_APP_NO, T3.OPTION_NO
+	</select>
+	
+	<select id="select_option_06" parameterType="map" resultType="hashmap">
+		SELECT
+			A.OPTION_NO, A.OPTION_APP_NO, B.OPTION_FILE_NO, C.PRODUCT_NO, D.PRODUCT_NAME, C.OPTION_FILE_NAME, B.OPTION_APP_NAME, A.OPTION_KEY_NAME, A.OPTION_DEFAULT_VALUE, A.OPTION_COMMENT
+		FROM
+			TB_OPTIONS A, TB_OPTION_APP B, TB_OPTION_FILE C, TB_PRODUCT D
+		WHERE
+			A.OPTION_NO = #{OPTION_NO}
+			AND A.OPTION_APP_NO = B.OPTION_APP_NO
+			AND B.OPTION_FILE_NO = C.OPTION_FILE_NO
+			AND C.PRODUCT_NO = D.PRODUCT_NO
+	</select>
+	
+	<insert id="add_file" parameterType="map">
+		INSERT INTO TB_OPTION_FILE 
+		       (OPTION_FILE_NAME, PRODUCT_NO)
+		VALUES (#{OPTION_FILE_NAME},#{PRODUCT_NO})
+	</insert>
+	
+	<update id="update_file" parameterType="map">
+		UPDATE TB_OPTION_FILE SET 
+		       	OPTION_FILE_NAME = #{OPTION_FILE_NAME}
+		 WHERE 
+		 		PRODUCT_NO = #{PRODUCT_NO}
+		   AND
+		   		OPTION_FILE_NO = #{OPTION_FILE_NO}
+	</update>
+	
+	<delete id="delete_file" parameterType="map">
+		DELETE FROM 
+		       	TB_OPTION_FILE
+		 WHERE 
+		 		PRODUCT_NO = #{PRODUCT_NO}
+		   AND
+		   		OPTION_FILE_NO = #{OPTION_FILE_NO}
+	</delete>
+	
+	
+	<insert id="add_app" parameterType="map">
+		INSERT INTO TB_OPTION_APP 
+		       (OPTION_APP_NAME, OPTION_FILE_NO, OPTION_APP_ORDER)
+		SELECT #{OPTION_APP_NAME},#{OPTION_FILE_NO}, 
+                   (SELECT IFNULL(MAX(OPTION_APP_ORDER),0)+1  
+                      FROM TB_OPTION_APP 
+                     WHERE OPTION_FILE_NO = #{OPTION_FILE_NO} ) VAL
+	</insert>
+	<update id="update_app" parameterType="map">
+		UPDATE TB_OPTION_APP SET
+				OPTION_APP_NAME = #{OPTION_APP_NAME}
+		WHERE 
+			OPTION_FILE_NO = #{OPTION_FILE_NO}
+		  AND 
+		  	OPTION_APP_NO = #{OPTION_APP_NO}
+	</update>
+	
+	<delete id="delete_app" parameterType="map">
+		DELETE FROM 
+				TB_OPTION_APP
+		WHERE 
+			OPTION_FILE_NO = #{OPTION_FILE_NO}
+		  AND 
+		  	OPTION_APP_NO = #{OPTION_APP_NO}		
+	</delete>
+	
+	<insert id="add_option" parameterType="map">
+		INSERT INTO TB_OPTIONS 
+		        (OPTION_KEY_NAME, OPTION_DEFAULT_VALUE, OPTION_APP_NO, OPTION_COMMENT)
+		VALUES (#{OPTION_KEY_NAME},#{OPTION_DEFAULT_VALUE},#{OPTION_APP_NO},#{OPTION_COMMENT})
+	</insert>
+	
+	<update id="update_option" parameterType="map">
+		UPDATE TB_OPTIONS SET 
+		        OPTION_KEY_NAME = #{OPTION_KEY_NAME},
+		        OPTION_DEFAULT_VALUE = #{OPTION_DEFAULT_VALUE},  
+		        OPTION_COMMENT = #{OPTION_COMMENT}
+		 WHERE 	
+		 		OPTION_APP_NO =#{OPTION_APP_NO}
+		   AND
+		   		OPTION_NO =  #{OPTION_NO}		
+	</update>
+	
+	<delete id="delete_option" parameterType="map">
+		DELETE  FROM 
+				TB_OPTIONS 
+		 WHERE 	
+		 		OPTION_APP_NO =#{OPTION_APP_NO}
+		   AND
+		   		OPTION_NO =  #{OPTION_NO}
+	</delete>
+	
+	<insert id="add_comment" parameterType="map">
+		INSERT INTO TB_COMMENTS 
+		        (COMMENT_VALUE, COMMENT_MEMO, OPTION_NO)
+		VALUES (#{COMMENT_VALUE},#{COMMENT_MEMO},#{OPTION_NO})
+	</insert>
+	
+	<update id="update_comment" parameterType="map">
+		UPDATE TB_COMMENTS SET 
+			COMMENT_VALUE = #{COMMENT_VALUE},
+			COMMENT_MEMO = #{COMMENT_MEMO}
+		WHERE 
+			OPTION_NO = #{OPTION_NO}
+		  AND 
+		  	COMMENT_NO =  #{COMMENT_NO}	
+	</update>
+	
+	<update id="delete_comment" parameterType="map">
+		DELETE FROM 
+			TB_COMMENTS
+		WHERE 
+			OPTION_NO = #{OPTION_NO}
+		  AND 
+		  	COMMENT_NO =  #{COMMENT_NO}
+	</update>
+	
+	<select id="select_option_04_02" resultType="int">
+		SELECT MAX(OPTION_FILE_NO) OPTION_FILE_NO
+		 FROM  TB_OPTION_FILE
+	</select>
+	<select id="select_option_04_03" resultType="int">
+		SELECT MAX(OPTION_APP_NO) OPTION_APP_NO
+		 FROM  TB_OPTION_APP
+	</select>
+	<select id="select_option_04_04" resultType="int">
+		SELECT MAX(OPTION_NO) OPTION_NO
+		 FROM  TB_OPTIONS
+	</select>
+		<select id="select_option_04_05" resultType="int">
+		SELECT MAX(COMMENT_NO) COMMENT_NO
+		 FROM  TB_COMMENTS
+	</select>
+	
+	<select id="select_option_05_02" resultType="hashmap">
+	SELECT * FROM TB_OPTION_FILE
+	</select>
+	
+	<select id="select_option_05_03" resultType="hashmap">
+	SELECT * FROM TB_OPTION_APP
+	</select>
+	
+	<select id="select_option_05_04" resultType="hashmap">
+	SELECT * FROM TB_OPTIONS
+	</select>
+
+</mapper>

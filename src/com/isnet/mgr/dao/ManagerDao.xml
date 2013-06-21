@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.isnet.mgr.dao.ManagerDao">
+	<select id="select_manager_01" parameterType="map" resultType="int">
+		SELECT COUNT(*)
+		FROM TB_CUSTOMER_MANAGER T1, TB_CUSTOMER T2
+		WHERE T1.CUSTOMER_NO = T2.CUSTOMER_NO
+		<if test="_SEARCH == true">
+			<choose>
+				<when test="SEARCH_OPER == 'cn'">
+					AND ${SEARCH_FIELD} LIKE CONCAT('%', #{SEARCH_STRING}, '%')
+				</when>
+				<when test="SEARCH_OPER == 'eq'">
+					AND ${SEARCH_FIELD} = #{SEARCH_STRING}
+				</when>
+			</choose>
+		</if>
+	</select>
+	 
+	<select id="select_manager_02" parameterType="map" resultType="hashmap">
+		SELECT T1.MANAGER_NO, T1.MANAGER_NAME
+		,      T1.MANAGER_EMAIL, T1.MANAGER_TEL
+		,      CASE WHEN T1.IS_USED = 'Y' THEN '사용' ELSE '미사용' END IS_USED
+		,      T1.CUSTOMER_NO, T2.CUSTOMER_NAME
+		FROM TB_CUSTOMER_MANAGER T1, TB_CUSTOMER T2
+		WHERE T1.CUSTOMER_NO = T2.CUSTOMER_NO
+		<if test="_SEARCH == true">
+			<choose>
+				<when test="SEARCH_OPER == 'cn'">
+					AND ${SEARCH_FIELD} LIKE CONCAT('%', #{SEARCH_STRING}, '%')
+				</when>
+				<when test="SEARCH_OPER == 'eq'">
+					AND ${SEARCH_FIELD} = #{SEARCH_STRING}
+				</when>
+			</choose>
+		</if>
+		<choose>
+			<when test="SIDX != '' ">
+			ORDER BY 
+				${SIDX} ${SORD}
+			</when>
+			<otherwise>
+				ORDER BY CUSTOMER_NAME
+			</otherwise>
+		</choose>
+		LIMIT 
+		#{BEGIN_INDEX}, #{ROWS}
+	</select>
+	
+	<select id="select_manager_03" parameterType="map" resultType="hashmap">
+		SELECT * FROM
+		(
+			SELECT T1.MANAGER_NO, T1.MANAGER_NAME
+			,      T1.MANAGER_EMAIL, T1.MANAGER_TEL
+			,      CASE WHEN T1.IS_USED = 'Y' THEN '사용' ELSE '미사용' END IS_USED
+			,      T1.CUSTOMER_NO, T2.CUSTOMER_NAME
+			FROM TB_CUSTOMER_MANAGER T1, TB_CUSTOMER T2
+			WHERE T1.CUSTOMER_NO = T2.CUSTOMER_NO
+		) T1
+		WHERE T1.CUSTOMER_NO = #{CUSTOMER_NO}
+		  AND T1.MANAGER_NAME = #{MANAGER_NAME}
+	</select>
+	
+	<insert id="insert_manager_01" parameterType="map">
+		INSERT INTO TB_CUSTOMER_MANAGER (
+			MANAGER_NAME, MANAGER_EMAIL, MANAGER_TEL, CUSTOMER_NO, IS_USED
+		) VALUES (
+			#{MANAGER_NAME}, #{MANAGER_EMAIL}, #{MANAGER_TEL}, #{CUSTOMER_NO}, #{IS_USED}
+		)
+	</insert>
+	
+	<update id="update_manager_01" parameterType="map">
+		UPDATE TB_CUSTOMER_MANAGER SET
+			<if test="MANAGER_NAME != null  and MANAGER_NAME !=''" >
+				MANAGER_NAME = #{MANAGER_NAME},
+			</if>
+			<if test="MANAGER_EMAIL != null  and MANAGER_EMAIL !=''" >
+				MANAGER_EMAIL = #{MANAGER_EMAIL},
+			</if>
+			<if test="MANAGER_TEL != null  and MANAGER_TEL !=''" >
+				MANAGER_TEL =#{MANAGER_TEL} ,
+			</if>
+			<if test="CUSTOMER_NO != null  and CUSTOMER_NO !=''" >
+				CUSTOMER_NO = #{CUSTOMER_NO},
+			</if>
+				IS_USED = #{IS_USED}
+		WHERE MANAGER_NO = #{MANAGER_NO}
+	</update>
+</mapper>

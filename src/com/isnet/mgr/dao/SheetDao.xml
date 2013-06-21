@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.isnet.mgr.dao.SheetDao">
+	<select id="select_support_type" resultType="hashmap">
+		SELECT 
+		   SUPPORT_TYPE_NO, SUPPORT_TYPE_NAME 
+	  	FROM 
+	       TB_SUPPORT_TYPE
+	</select>
+	
+	<!-- 수정 -->
+	<select id="select_sheet_01" parameterType="map" resultType="hashmap">
+		SELECT
+			A.SHEET_NO, A.EMPLOYEE_NO, B.EMPLOYEE_NAME, A.CUSTOMER_NO, C.CUSTOMER_NAME, A.CLIENT_NAME, A.WRITE_DATE, 
+			A.START_TIME, A.END_TIME, A.SHEET_TITLE, 
+			(SELECT GROUP_CONCAT(SUPPORT_TYPE_NAME) 
+			FROM TB_SUPPORT_TYPE
+			WHERE SUPPORT_TYPE_NO IN (SELECT SUPPORT_TYPE_NO FROM TB_SHEET_SUPPORT_LIST X WHERE X.SHEET_NO = A.SHEET_NO)) SUPPORT_TYPE_NAME
+		FROM 
+			TB_SHEET A, TB_EMPLOYEE B, TB_CUSTOMER C
+		WHERE
+			A.EMPLOYEE_NO = B.EMPLOYEE_NO
+			AND A.CUSTOMER_NO = C.CUSTOMER_NO 
+		<if test="searchField != null">
+			<choose>
+				<when test="searchOper eq 'cn'">
+					AND A.${searchField} LIKE CONCAT('%', #{searchString}, '%')
+				</when>
+				<when test="searchOper eq 'eq'">
+					AND A.${searchField} =  #{searchString}
+				</when>
+			</choose>
+		</if>		
+		ORDER BY 
+			WRITE_DATE DESC
+		LIMIT 
+			#{BEGIN_INDEX}, #{ROWS}
+		
+	</select>
+
+	<!-- 수정 -->
+	<select id="select_sheet_02" parameterType="map" resultType="int">
+		SELECT 
+		       COUNT(*) TOTAL_COUNT
+		FROM
+			TB_SHEET
+		<if test="searchField != null">
+			<where>
+				<choose>
+					<when test="searchOper eq 'cn'">
+						${searchField} LIKE CONCAT('%', #{searchString}, '%')
+					</when>
+					<when test="searchOper eq 'eq'">
+						${searchField} =  #{searchString}
+					</when>
+				</choose>
+			</where>	
+		</if>		
+	</select>
+	
+	<!-- 수정 -->	
+	<select id="select_sheet_03" parameterType="map" resultType="hashmap">
+		SELECT
+			A.SHEET_NO, A.EMPLOYEE_NO, B.EMPLOYEE_NAME, A.WRITE_DATE, A.CUSTOMER_NO, C.CUSTOMER_NAME, A.CLIENT_NAME,
+			A.START_TIME, A.END_TIME, 
+			A.SHEET_TITLE, A.SHEET_CONTENT,
+			(SELECT GROUP_CONCAT(SUPPORT_TYPE_NAME) 
+			FROM TB_SUPPORT_TYPE
+			WHERE SUPPORT_TYPE_NO IN (SELECT SUPPORT_TYPE_NO FROM TB_SHEET_SUPPORT_LIST X WHERE X.SHEET_NO = A.SHEET_NO)) SUPPORT_TYPE_NAME
+		FROM 
+			TB_SHEET A, TB_EMPLOYEE B, TB_CUSTOMER C
+		WHERE
+			A.WRITE_DATE = #{WRITE_DATE}
+			AND A.EMPLOYEE_NO = #{EMPLOYEE_NO}
+			AND A.EMPLOYEE_NO = B.EMPLOYEE_NO
+			AND A.CUSTOMER_NO = C.CUSTOMER_NO
+	</select>
+	
+	<!-- 수정 -->
+	<select id="select_sheet_04" parameterType="map" resultType="hashmap">
+		SELECT 
+			A.SHEET_NO, A.WRITE_DATE, A.EMPLOYEE_NO, A.CUSTOMER_NO, A.CLIENT_NAME, A.START_TIME, A.END_TIME, A.SHEET_TITLE, A.SHEET_CONTENT
+		FROM 
+			TB_SHEET A
+		WHERE
+			SHEET_NO = ${SHEET_NO}
+	</select>
+	
+	<!-- 수정 -->
+	<select id="select_sheet_05" parameterType="map" resultType="hashmap">
+		SELECT 
+			A.SHEET_NO, A.SUPPORT_TYPE_NO, B.SUPPORT_TYPE_NAME
+		FROM
+			TB_SHEET_SUPPORT_LIST A, TB_SUPPORT_TYPE B
+		WHERE
+			A.SHEET_NO = #{SHEET_NO}
+			AND A.SUPPORT_TYPE_NO = B.SUPPORT_TYPE_NO
+	</select>
+	
+	<!-- 원격지원 -->
+	<select id="select_sheet_08" parameterType="int" resultType="hashmap">
+		SELECT
+			A.REMOTE_NO, A.WRITE_DATE, A.EMPLOYEE_NO, A.CUSTOMER_NO, B.CUSTOMER_NAME, A.CLIENT_NAME, A.ACCEPTED_TIME, A.COMPLETED_TIME, A.REMOTE_CONTENT
+		FROM
+			TB_SHEET_REMOTE A, TB_CUSTOMER B
+		WHERE
+			A.WRITE_DATE = #{WRITE_DATE}
+			AND A.EMPLOYEE_NO = #{EMPLOYEE_NO}
+			AND A.CUSTOMER_NO = B.CUSTOMER_NO
+	</select>
+	
+	<!-- 수정 -->
+	<select id="select_sheet_10" parameterType="int" resultType="hashmap">
+		SELECT 
+			A.REMOTE_NO, A.WRITE_DATE, A.EMPLOYEE_NO, A.CUSTOMER_NO, B.CUSTOMER_NAME, A.CLIENT_NAME, A.ACCEPTED_TIME, A.COMPLETED_TIME, A.REMOTE_CONTENT
+		FROM
+			TB_SHEET_REMOTE A, TB_CUSTOMER B
+		WHERE
+			A.REMOTE_NO = #{REMOTE_NO}
+			AND A.CUSTOMER_NO = B.CUSTOMER_NO
+	</select>
+	
+	<select id="select_sheet_11" parameterType="map" resultType="hashmap">
+		SELECT 	
+			${QUERY}
+			IFNULL (X.WRITE_DATE, '총계') WRITE_DATE
+		FROM(
+			SELECT 
+				A.WRITE_DATE, B.DEPT_NO, B.EMPLOYEE_NAME, COUNT(*) CNT
+			FROM 
+				TB_SHEET A JOIN TB_EMPLOYEE B ON ( A.EMPLOYEE_NO = B.EMPLOYEE_NO AND B.IS_USED = 'Y' AND B.DEPT_NO = #{DEPT_NO}) 
+			WHERE
+				A.WRITE_DATE &gt;= #{START_DATE} AND A.WRITE_DATE &lt;= #{END_DATE}
+			GROUP BY
+				A.WRITE_DATE, B.DEPT_NO, B.EMPLOYEE_NAME
+		)X
+		GROUP BY
+			X.WRITE_DATE
+		WITH
+			ROLLUP	
+	</select>
+	
+	<!-- 수정 -->
+	<select id="select_sheet_12" parameterType="map" resultType="hashmap">
+		SELECT
+			A.SHEET_NO, A.WRITE_DATE, B.CUSTOMER_NAME, A.CLIENT_NAME, A.SHEET_TITLE, A.SHEET_CONTENT
+		FROM 
+			TB_SHEET A, TB_CUSTOMER B
+		WHERE
+			A.WRITE_DATE &gt;= #{START_DATE} 
+			AND A.WRITE_DATE &lt;= #{END_DATE}
+			AND A.EMPLOYEE_NO = #{EMPLOYEE_NO}
+			AND A.CUSTOMER_NO = B.CUSTOMER_NO
+		ORDER BY
+			A.WRITE_DATE DESC
+	</select>
+	
+	<!-- 수정 -->
+	<insert id="add_sheet01" parameterType="map" useGeneratedKeys="true" keyProperty="SHEET_NO">
+		INSERT INTO 
+			TB_SHEET(SHEET_NO, WRITE_DATE, EMPLOYEE_NO, CUSTOMER_NO, CLIENT_NAME, START_TIME, END_TIME, SHEET_TITLE, SHEET_CONTENT)
+		VALUES
+			(#{SHEET_NO}, #{WRITE_DATE}, #{EMPLOYEE_NO}, #{CUSTOMER_NO}, #{CLIENT_NAME}, #{START_TIME}, #{END_TIME}, #{SHEET_TITLE}, #{SHEET_CONTENT})
+	</insert>
+	
+	<!-- 수정 -->
+	<insert id="add_sheet02" parameterType="map">
+		INSERT INTO TB_SHEET_REMOTE
+			(WRITE_DATE, EMPLOYEE_NO, CUSTOMER_NO, CLIENT_NAME, ACCEPTED_TIME, COMPLETED_TIME, REMOTE_CONTENT)
+		VALUES 
+			(#{WRITE_DATE}, #{EMPLOYEE_NO}, #{CUSTOMER_NO}, #{CLIENT_NAME}, #{ACCEPTED_TIME}, #{COMPLETED_TIME},  #{REMOTE_CONTENT} )
+	</insert>
+	
+	<!-- 수정 -->
+	<insert id="add_sheet03" parameterType="map">
+		INSERT INTO 
+			TB_SHEET_SUPPORT_LIST(SHEET_NO , SUPPORT_TYPE_NO)
+		VALUES
+			(#{SHEET_NO} , #{SUPPORT_TYPE_NO})
+	</insert>
+	
+	<!-- 수정 -->
+	<delete id="del_Sheet01" parameterType="map">
+		DELETE FROM
+			TB_SHEET
+		WHERE
+			SHEET_NO = #{SHEET_NO} 
+	</delete>
+	
+	<!-- 수정 -->
+	<delete id="del_Sheet02" parameterType="map">
+		DELETE FROM
+			TB_SHEET_SUPPORT_LIST
+		WHERE
+			SHEET_NO = #{SHEET_NO} 
+	</delete>
+	
+	<!-- 수정 -->
+	<delete id="del_Remote01" parameterType="map">
+		DELETE FROM
+			FROM TB_SHEET_REMOTE
+		WHERE 
+			REMOTE_NO = #{REMOTE_NO}
+	</delete>
+	
+	<!-- 수정 -->
+	<update id="update_sheet01" parameterType="map">
+		UPDATE TB_SHEET
+		<set>
+			<if test="WRITE_DATE != null">
+				WRITE_DATE = #{WRITE_DATE},
+			</if>
+			<if test="CUSTOMER_NO != null">
+				CUSTOMER_NO = #{CUSTOMER_NO},
+			</if>
+			<if test="CLIENT_NAME != null">
+				CLIENT_NAME = #{CLIENT_NAME},
+			</if>
+			<if test="START_TIME != null">
+				START_TIME = #{START_TIME},
+			</if>
+			<if test="END_TIME != null">
+				END_TIME = #{END_TIME},
+			</if>
+			<if test="SHEET_TITLE != null">
+				SHEET_TITLE = #{SHEET_TITLE},
+			</if>
+			<if test="SHEET_CONTENT != null">
+				SHEET_CONTENT = #{SHEET_CONTENT},
+			</if>
+		</set>
+		WHERE
+			SHEET_NO = #{SHEET_NO}
+	</update> 
+	
+	<!-- 수정 -->
+	<update id="update_sheet02" parameterType="map">
+		UPDATE TB_SHEET_REMOTE
+		<set>
+			<if test="WRITE_DATE != null">
+				WRITE_DATE = #{WRITE_DATE},
+			</if>
+			<if test="CUSTOMER_NO != null">
+				CUSTOMER_NO = #{CUSTOMER_NO},
+			</if>
+			<if test="CLIENT_NAME != null">
+				CLIENT_NAME = #{CLIENT_NAME},
+			</if>
+			<if test="ACCEPTED_TIME != null">
+				ACCEPTED_TIME = #{ACCEPTED_TIME},
+			</if>
+			<if test="COMPLETED_TIME != null">
+				COMPLETED_TIME = #{COMPLETED_TIME},
+			</if>
+			<if test="REMOTE_CONTENT != null">
+				REMOTE_CONTENT = #{REMOTE_CONTENT},
+			</if>
+		</set>
+		WHERE
+			REMOTE_NO = #{REMOTE_NO}
+	</update> 
+	
+	
+	
+</mapper>

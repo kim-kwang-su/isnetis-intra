@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.isnet.mgr.dao.EmployeeDao">
+	
+	<select id="select_employee_01" parameterType="map" resultType="hashmap">
+		SELECT
+			EMPLOYEE_NO, EMPLOYEE_NAME, DEPT_NO, IS_ADMIN, CREATE_DATE, LAST_LOGIN_TIME, IS_MAIL_CC, EMAIL
+		FROM
+			TB_EMPLOYEE
+		WHERE 
+			IS_USED = 'Y'
+			AND IS_ADMIN = 'N'
+		<if test="DEPT_NO != null">
+			AND DEPT_NO = #{DEPT_NO}
+		</if>
+		ORDER BY
+			EMPLOYEE_NAME
+	</select>
+	
+	<select id="select_employee_02" parameterType="map" resultType="hashmap">
+		SELECT
+			A.EMPLOYEE_NO, A.EMPLOYEE_NAME, A.DEPT_NO, A.LOGIN_PASSWORD, A.EMAIL, A.IS_USED, A.IS_ADMIN, A.CREATE_DATE, B.DEPT_NAME, LAST_LOGIN_TIME, TEL_NO, PHONE_NO, DEPT_POSITION, IS_MAIL_CC, IS_SEC
+		FROM
+			TB_EMPLOYEE A, TB_DEPT B
+		WHERE
+			A.DEPT_NO = B.DEPT_NO
+		<if test="EMPLOYEE_NO != null">
+			AND EMPLOYEE_NO = #{EMPLOYEE_NO}
+		</if>
+		<if test="EMAIL != null">
+			AND EMAIL = #{EMAIL}
+		</if>
+		<if test="BEGIN_INDEX != null">
+			LIMIT 
+			#{BEGIN_INDEX}, #{ROWS}	
+		</if>
+	</select>
+	
+	<select id="select_employee_03" parameterType="map" resultType="int">
+		SELECT
+			count(*)
+		FROM
+			TB_EMPLOYEE A
+		<where>
+			<if test="EMPLOYEE_NO != null">
+				EMPLOYEE_NO = #{EMPLOYEE_NO}
+			</if>
+			<if test="EMAIL != null">
+				EMAIL = #{EMAIL}
+			</if>
+		</where>
+	</select>
+	
+	<select id="select_employee_04" resultType="string">
+		SELECT
+			EMAIL
+		FROM 
+			TB_EMPLOYEE
+		WHERE
+			IS_MAIL_CC = 'Y'
+	</select>
+	
+	<insert id="insert_employee_01" parameterType="map">
+		INSERT INTO TB_EMPLOYEE
+			(EMPLOYEE_NAME, EMAIL, LOGIN_PASSWORD, DEPT_NO, DEPT_POSITION, IS_USED, IS_ADMIN, CREATE_DATE, IS_MAIL_CC)
+		VALUES
+			(#{EMPLOYEE_NAME}, #{EMAIL}, #{LOGIN_PASSWORD}, #{DEPT_NO}, #{DEPT_POSITION},'Y', 'N', #{CREATE_DATE}, #{IS_MAIL_CC})
+	</insert>
+	
+	<update id="update_employee_01" parameterType="map">
+		UPDATE 
+			TB_EMPLOYEE
+		<set>
+			<if test="IS_USED != null">
+			IS_USED = #{IS_USED},
+			</if>
+			<if test="DEPT_NO != null">
+			DEPT_NO = #{DEPT_NO},
+			</if>
+			<if test="DEPT_POSITION != null">
+			DEPT_POSITION = #{DEPT_POSITION},
+			</if>
+			<if test="EMPLOYEE_NAME != null">
+			EMPLOYEE_NAME = #{EMPLOYEE_NAME},
+			</if>
+			<if test="EMAIL != null">
+			EMAIL = #{EMAIL},
+			</if>
+			<if test="LOGIN_PASSWORD != null">
+			LOGIN_PASSWORD = #{LOGIN_PASSWORD},
+			</if>
+			<if test="LAST_LOGIN_TIME != null">
+			LAST_LOGIN_TIME = #{LAST_LOGIN_TIME},
+			</if>
+			<if test="IS_MAIL_CC != null">
+			IS_MAIL_CC = #{IS_MAIL_CC},
+			</if>
+		</set>
+		WHERE
+			EMPLOYEE_NO = #{EMPLOYEE_NO}
+	</update>
+	
+</mapper>

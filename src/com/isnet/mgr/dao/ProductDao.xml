@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.isnet.mgr.dao.ProductDao">
+	<select id="select_product_01" resultType="hashmap">
+		SELECT 
+			PRODUCT_NO, PRODUCT_NAME, PRODUCT_CODE
+        FROM 
+        	TB_PRODUCT
+        ORDER 
+        	BY PRODUCT_NAME 
+	</select>
+	
+	<select id="select_product_02" parameterType="map" resultType="hashmap">
+	   SELECT 
+	          PRODUCT_NO, PRODUCT_NAME, PRODUCT_CODE
+        FROM 
+              TB_PRODUCT
+        <if test="PRODUCT_NO != null ">	      
+        WHERE 
+              PRODUCT_NO = ${PRODUCT_NO}
+        </if> 
+        ORDER 
+              BY PRODUCT_NAME 
+	</select>
+	<insert id="add_product" parameterType="map">
+		INSERT INTO TB_PRODUCT (PRODUCT_NAME, PRODUCT_CODE) 
+		VALUES ('${PRODUCT_NAME}','${PRODUCT_CODE}')
+	</insert>
+</mapper>
